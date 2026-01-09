@@ -40,7 +40,7 @@
             -webkit-tap-highlight-color: transparent;
             padding-bottom: 80px;
             user-select: none;
-            opacity: 0; /* PER FADE-IN INIZIALE */
+            opacity: 0;
             transition: opacity 0.5s ease;
         }
         
@@ -72,19 +72,47 @@
         .stepper-container { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 5px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .step-btn { background: linear-gradient(145deg, #222, #111); border: 1px solid var(--accent-dim); color: var(--accent); width: 45px; height: 45px; border-radius: 10px; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.1s; }
         .step-btn:active { transform: scale(0.9); background: var(--accent); color: #000; }
-        .step-display { flex: 1; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; }
-        .step-display input { background: transparent; border: none; color: #fff; text-align: center; font-size: 18px; font-weight: 700; width: 100%; outline: none; -moz-appearance: textfield; }
-        .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
+        
+        .step-display { flex: 1; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; position: relative; }
+        
+        /* INPUT MODIFICATI PER SCRITTURA */
+        .step-display input { 
+            background: transparent; 
+            border: 1px solid transparent; /* Bordo invisibile di base */
+            color: #fff; 
+            text-align: center; 
+            font-size: 18px; 
+            font-weight: 700; 
+            width: 100%; 
+            outline: none; 
+            -moz-appearance: textfield; 
+            border-radius: 6px;
+            transition: background 0.2s, border 0.2s;
+            padding: 2px;
+        }
+        
+        /* Effetto quando clicchi per scrivere */
+        .step-display input:focus {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Rimuove le freccette standard del browser dagli input numerici */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; pointer-events: none; }
 
         /* DNA BADGE */
         .dna-badge { background: rgba(212, 175, 55, 0.2); border: 1px solid var(--accent); color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
 
         /* UNIFORM ACTION BUTTONS */
         .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-        
         .action-btn { width: 100%; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; border: none; transition: transform 0.1s; text-decoration: none; }
         .action-btn:active { transform: scale(0.98); }
-
         .btn-red { background: rgba(255, 82, 82, 0.15); border: 1px solid var(--danger); color: #ff8a80; }
         .btn-red.active { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(255, 82, 82, 0.4); }
         .btn-blue { background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); color: var(--telegram); }
@@ -102,9 +130,6 @@
         .text-red { color: var(--danger); }
         .text-gold { color: var(--accent); }
 
-        /* TOOLS UI */
-        .tool-input { background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 10px; color: #fff; width: 100%; box-sizing: border-box; font-family: 'Roboto Mono'; text-align: center; font-size: 16px; }
-
         /* COMMON */
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
@@ -117,31 +142,12 @@
         .chart-wrapper { position: relative; height: 220px; width: 100%; margin-top:20px; }
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
-        .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; }
         
         .info-icon { background: rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 14px; height: 14px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; margin-left: 5px; }
         .info-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 12px; color: #ccc; margin-top: 10px; border-left: 3px solid var(--accent); }
 
-        /* PULSANTE CANALE SELECTA (NUOVO STILE) */
-        .cta-btn {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 16px;
-            margin: 20px 0;
-            background-color: var(--telegram); /* Blu Telegram */
-            color: white;
-            text-decoration: none; /* Rimuove sottolineatura */
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 16px;
-            box-shadow: 0 5px 15px rgba(34, 158, 217, 0.4);
-            transition: transform 0.2s, opacity 0.2s;
-            box-sizing: border-box;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        /* CTA BTN */
+        .cta-btn { display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px; margin: 20px 0; background-color: var(--telegram); color: white; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; box-shadow: 0 5px 15px rgba(34, 158, 217, 0.4); transition: transform 0.2s, opacity 0.2s; box-sizing: border-box; text-transform: uppercase; letter-spacing: 0.5px; }
         .cta-btn:hover { opacity: 0.9; }
         .cta-btn:active { transform: scale(0.98); }
 
@@ -178,27 +184,27 @@
             
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-initial', -500)">-</div>
-                <div class="step-display"><span class="step-label">Capitale Iniziale (€)</span><input type="number" id="pac-initial" value="5000" onchange="calculatePAC()" readonly></div>
+                <div class="step-display"><span class="step-label">Capitale Iniziale (€)</span><input type="number" id="pac-initial" value="5000" onchange="calculatePAC()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('pac-initial', 500)">+</div>
             </div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-monthly', -50)">-</div>
-                <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculatePAC()" readonly></div>
+                <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculatePAC()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('pac-monthly', 50)">+</div>
             </div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-years', -1)">-</div>
-                <div class="step-display"><span class="step-label">Durata (Anni)</span><input type="number" id="pac-years" value="15" onchange="calculatePAC()" readonly></div>
+                <div class="step-display"><span class="step-label">Durata (Anni)</span><input type="number" id="pac-years" value="15" onchange="calculatePAC()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('pac-years', 1)">+</div>
             </div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-rate', -0.5)">-</div>
-                <div class="step-display"><span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span><input type="number" id="pac-rate" value="8" step="0.5" onchange="calculatePAC()" readonly></div>
+                <div class="step-display"><span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span><input type="number" id="pac-rate" value="8" step="0.5" onchange="calculatePAC()" inputmode="decimal"></div>
                 <div class="step-btn" onclick="changeVal('pac-rate', 0.5)">+</div>
             </div>
              <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-fees', -50)">-</div>
-                <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" readonly></div>
+                <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('pac-fees', 50)">+</div>
             </div>
 
@@ -241,22 +247,22 @@
             
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-asset-val', -5000)">-</div>
-                <div class="step-display"><span class="step-label">Valore Asset (€)</span><input type="number" id="ren-asset-val" value="200000" onchange="calculateRen()" readonly></div>
+                <div class="step-display"><span class="step-label">Valore Asset (€)</span><input type="number" id="ren-asset-val" value="200000" onchange="calculateRen()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('ren-asset-val', 5000)">+</div>
             </div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-invested', -5000)">-</div>
-                <div class="step-display"><span class="step-label">Capitale Versato (€)</span><input type="number" id="ren-invested" value="150000" onchange="calculateRen()" readonly></div>
+                <div class="step-display"><span class="step-label">Capitale Versato (€)</span><input type="number" id="ren-invested" value="150000" onchange="calculateRen()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('ren-invested', 5000)">+</div>
             </div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-monthly', -50)">-</div>
-                <div class="step-display"><span class="step-label">Rendita Mensile (€)</span><input type="number" id="ren-monthly" value="800" onchange="calculateRen()" readonly></div>
+                <div class="step-display"><span class="step-label">Rendita Mensile (€)</span><input type="number" id="ren-monthly" value="800" onchange="calculateRen()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('ren-monthly', 50)">+</div>
             </div>
              <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-years', -1)">-</div>
-                <div class="step-display"><span class="step-label">Anni Proiezione</span><input type="number" id="ren-years" value="15" onchange="calculateRen()" readonly></div>
+                <div class="step-display"><span class="step-label">Anni Proiezione</span><input type="number" id="ren-years" value="15" onchange="calculateRen()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('ren-years', 1)">+</div>
             </div>
             
@@ -295,7 +301,7 @@
             
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeFire(-50)">-</div>
-                <div class="step-display"><span class="step-label">Spese Mensili (€)</span><input type="number" id="fire-expenses" value="1500" readonly></div>
+                <div class="step-display"><span class="step-label">Spese Mensili (€)</span><input type="number" id="fire-expenses" value="1500" onchange="calcFire()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeFire(50)">+</div>
             </div>
             
@@ -314,7 +320,7 @@
             <div class="card-title">☕ Sprechi vs Investimenti</div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeWaste(-0.5)">-</div>
-                <div class="step-display"><span class="step-label">Spreco Giornaliero (€)</span><input type="number" id="waste-daily" value="3.5" readonly></div>
+                <div class="step-display"><span class="step-label">Spreco Giornaliero (€)</span><input type="number" id="waste-daily" value="3.5" onchange="calcWaste()" inputmode="decimal"></div>
                 <div class="step-btn" onclick="changeWaste(0.5)">+</div>
             </div>
             <div class="res-grid">
@@ -349,7 +355,7 @@
     </a>
     
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.2 Polish</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.3 Polish</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -362,7 +368,6 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        // FADE IN ON LOAD
         window.addEventListener('load', () => { document.body.classList.add('loaded'); });
 
         let pacChart = null; let renChart = null;
@@ -443,11 +448,9 @@
             if(rate >= 0.12 || crashMode) dna = "🐺 Lupo di Wall Street";
             document.getElementById('pac-dna').innerText = dna;
 
-            // CONFETTI
             if(grossFinal >= 100000 && lastMilestone < 100000) { confetti({particleCount: 100, spread: 70, origin: { y: 0.6 }}); lastMilestone = 100000; }
             else if(grossFinal < 100000) lastMilestone = 0; 
 
-            // CHART UPDATE
             let chartLabels = pacMode === 'pie' ? ['Versato', 'Guadagno'] : labels;
             let chartData1 = pacMode === 'pie' ? [currentInvested, gainTotal] : dataTot;
             let chartData2 = pacMode === 'pie' ? null : dataInv;
@@ -483,7 +486,6 @@
             updateComparison();
         }
 
-        // --- NEW TOOLS LOGIC ---
         function changeFire(amount) { triggerHaptic(); let inp = document.getElementById('fire-expenses'); inp.value = (parseFloat(inp.value)||0) + amount; calcFire(); }
         function calcFire() {
             let exp = parseFloat(document.getElementById('fire-expenses').value) || 0;
@@ -525,12 +527,11 @@
             let instance = (id === 'pacChart') ? pacChart : renChart;
             if(instance) instance.destroy();
 
-            // GRADIENT LOGIC
             let bg1 = colors[0];
             if(mode === 'line') {
                 let gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                gradient.addColorStop(0, colors[0] + '66'); // 40% opacity
-                gradient.addColorStop(1, colors[0] + '00'); // 0% opacity
+                gradient.addColorStop(0, colors[0] + '66'); 
+                gradient.addColorStop(1, colors[0] + '00'); 
                 bg1 = gradient;
             }
 

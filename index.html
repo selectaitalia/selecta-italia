@@ -75,28 +75,16 @@
         
         .step-display { flex: 1; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; position: relative; }
         
-        /* INPUT MODIFICATI PER SCRITTURA DIRETTA */
         .step-display input { 
-            background: transparent; 
-            border: 1px solid transparent; 
-            color: #fff; 
-            text-align: center; 
-            font-size: 18px; 
-            font-weight: 700; 
-            width: 100%; 
-            outline: none; 
-            -moz-appearance: textfield; 
-            border-radius: 6px;
-            transition: background 0.2s, border 0.2s;
-            padding: 2px;
+            background: transparent; border: 1px solid transparent; color: #fff; 
+            text-align: center; font-size: 18px; font-weight: 700; width: 100%; 
+            outline: none; -moz-appearance: textfield; border-radius: 6px;
+            transition: background 0.2s, border 0.2s; padding: 2px;
         }
-        .step-display input:focus {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
+        .step-display input:focus { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
         .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; pointer-events: none; }
+        .step-sublabel { font-size: 9px; color: var(--success); margin-top: 2px; font-weight: normal; }
 
         /* DNA BADGE */
         .dna-badge { background: rgba(212, 175, 55, 0.2); border: 1px solid var(--accent); color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
@@ -122,7 +110,7 @@
         .text-red { color: var(--danger); }
         .text-gold { color: var(--accent); }
 
-        /* COMMON */
+        /* SWITCHES */
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -184,6 +172,17 @@
                 <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculatePAC()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('pac-monthly', 50)">+</div>
             </div>
+
+            <div class="stepper-container" style="border: 1px solid rgba(255,82,82,0.3); background: rgba(255,82,82,0.05);">
+                <div class="step-btn" onclick="changeVal('pac-withdrawal', -50)" style="color:#ff8a80; border-color:#ff8a80;">-</div>
+                <div class="step-display">
+                    <span class="step-label" style="color:#ff8a80;">Prelievo Mensile (Lordo)</span>
+                    <input type="number" id="pac-withdrawal" value="0" onchange="calculatePAC()" inputmode="numeric">
+                    <span id="pac-withdrawal-net" class="step-sublabel">Netto: € 0</span>
+                </div>
+                <div class="step-btn" onclick="changeVal('pac-withdrawal', 50)" style="color:#ff8a80; border-color:#ff8a80;">+</div>
+            </div>
+
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-years', -1)">-</div>
                 <div class="step-display"><span class="step-label">Durata (Anni)</span><input type="number" id="pac-years" value="15" onchange="calculatePAC()" inputmode="numeric"></div>
@@ -259,8 +258,12 @@
             </div>
 
             <div class="switch-container">
-                <div style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:5px;">Calcola Inflazione <span class="info-icon" onclick="showInfo('inflation')">i</span></div>
+                <div style="font-size:12px; color:#aaa;">Calcola Inflazione (2%)</div>
                 <label class="switch"><input type="checkbox" id="ren-inflation" onchange="calculateRen()"><span class="slider"></span></label>
+            </div>
+            <div class="switch-container" style="border-top:none; margin-top:0;">
+                <div style="font-size:12px; color:#aaa;">Tasse (Cedolare 21%)</div>
+                <label class="switch"><input type="checkbox" id="ren-tax" onchange="calculateRen()"><span class="slider"></span></label>
             </div>
             
             <div class="results-box">
@@ -352,7 +355,7 @@
     </a>
     
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.4 Polish</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.6 Polish</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -411,11 +414,16 @@
         function calculatePAC() {
             let P = parseFloat(document.getElementById('pac-initial').value) || 0;
             let PMT = parseFloat(document.getElementById('pac-monthly').value) || 0;
+            let withdrawal = parseFloat(document.getElementById('pac-withdrawal').value) || 0; // NEW
             let years = parseFloat(document.getElementById('pac-years').value) || 1;
             let rate = (parseFloat(document.getElementById('pac-rate').value) || 0) / 100;
             let costs = parseFloat(document.getElementById('pac-fees').value) || 0;
             let useInflation = document.getElementById('pac-inflation').checked;
             
+            // AGGIORNA LABEL NETTO
+            let netWith = withdrawal * 0.74; // 26% tax approx
+            document.getElementById('pac-withdrawal-net').innerText = "Netto in tasca: " + fmt.format(netWith);
+
             let months = years * 12;
             let monthlyRate = rate / 12;
             let currentTotal = P - costs;
@@ -425,8 +433,17 @@
             let crashMonth = Math.floor(months / 2);
 
             for(let i=1; i<=months; i++){
-                currentTotal = (currentTotal + PMT) * (1 + monthlyRate);
+                // Interesse
+                currentTotal = currentTotal * (1 + monthlyRate);
+                
+                // Versamento
+                currentTotal += PMT;
                 currentInvested += PMT;
+                
+                // Prelievo (se c'è)
+                currentTotal -= withdrawal;
+                if(currentTotal < 0) currentTotal = 0; // Non può andare sotto zero
+
                 if(crashMode && i === crashMonth) currentTotal = currentTotal * 0.65; 
                 if(i % 12 === 0) { labels.push(`A${i/12}`); dataTot.push(currentTotal); dataInv.push(currentInvested); }
             }
@@ -463,15 +480,16 @@
             let Rent = parseFloat(document.getElementById('ren-monthly').value)||0;
             let years = parseFloat(document.getElementById('ren-years').value)||1;
             let useInflation = document.getElementById('ren-inflation').checked;
+            let useTax = document.getElementById('ren-tax').checked;
+
+            let cash = Rent * 12 * years;
             
-            let cash = Rent * 12 * years; 
+            if(useTax) cash = cash * 0.79; 
+            
             let total = Asset + cash; 
 
-            // LOGICA INFLAZIONE RENDITA
-            // Se attiva, sconta il valore finale totale al tasso del 2% annuo composto
             if(useInflation) {
                 total = total / Math.pow(1.02, years);
-                // Scaliamo proporzionalmente anche le parti per visualizzazione
                 let factor = 1 / Math.pow(1.02, years);
                 Asset = Asset * factor;
                 cash = cash * factor;

@@ -29,6 +29,8 @@
             --danger: #ff5252;
             --warning: #ffab00;
             --telegram: #229ED9;
+            --chart-base: #4a5568; /* Grigio per il capitale */
+            --chart-gain: #00e676; /* Verde per il profitto */
         }
 
         body {
@@ -250,10 +252,19 @@
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeRenYield(-0.5)">-</div>
                 <div class="step-display">
-                    <span class="step-label">Rendimento Annuo (%)</span>
+                    <span class="step-label">Rendimento Affitto/Div. (%)</span>
                     <input type="number" id="ren-yield" value="4.8" onchange="updateRenFromYield()" inputmode="decimal">
                 </div>
                 <div class="step-btn" onclick="changeRenYield(0.5)">+</div>
+            </div>
+
+            <div class="stepper-container">
+                <div class="step-btn" onclick="changeRenAppr(-0.5)">-</div>
+                <div class="step-display">
+                    <span class="step-label">Rivalutazione Asset Annua (%)</span>
+                    <input type="number" id="ren-appreciation" value="2" step="0.5" onchange="calculateRen()" inputmode="decimal">
+                </div>
+                <div class="step-btn" onclick="changeRenAppr(0.5)">+</div>
             </div>
 
             <div class="stepper-container">
@@ -365,7 +376,7 @@
     </a>
     
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.7 Polish</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.8 Polish</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -384,6 +395,7 @@
         let pacMode = 'line'; let renMode = 'line';
         let crashMode = false;
         const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+        const chartColors = ['#4a5568', '#00e676']; // Standard Colors: Grey, Green
 
         function triggerHaptic() { if(tg.HapticFeedback) tg.HapticFeedback.selectionChanged(); }
 
@@ -449,7 +461,11 @@
                 if(currentTotal < 0) currentTotal = 0;
 
                 if(crashMode && i === crashMonth) currentTotal = currentTotal * 0.65; 
-                if(i % 12 === 0) { labels.push(`A${i/12}`); dataTot.push(currentTotal); dataInv.push(currentInvested); }
+                
+                // PUSH DATA EVERY MONTH FOR SMOOTH LINE
+                labels.push(''); // No label per month to avoid clutter
+                dataTot.push(currentTotal);
+                dataInv.push(currentInvested);
             }
 
             let grossFinal = currentTotal;
@@ -468,16 +484,15 @@
             if(grossFinal >= 100000 && lastMilestone < 100000) { confetti({particleCount: 100, spread: 70, origin: { y: 0.6 }}); lastMilestone = 100000; }
             else if(grossFinal < 100000) lastMilestone = 0; 
 
-            let chartLabels = pacMode === 'pie' ? ['Versato', 'Guadagno'] : labels;
+            let chartLabels = pacMode === 'pie' ? ['Capitale Proprio', 'Profitto Totale'] : labels;
             let chartData1 = pacMode === 'pie' ? [currentInvested, gainTotal] : dataTot;
             let chartData2 = pacMode === 'pie' ? null : dataInv;
-            let chartColors = pacMode === 'pie' ? ['#004d40', '#00e676'] : ['#00e676', '#004d40'];
-
+            
             updateChart('pacChart', pacMode, chartLabels, chartData1, chartData2, chartColors);
             updateComparison();
         }
 
-        // --- NUOVE FUNZIONI LOGICA RENDITA (BIDIREZIONALE) ---
+        // --- REN LOGIC ---
 
         function changeRenYield(amount) {
             triggerHaptic();
@@ -488,17 +503,21 @@
             input.value = newVal.toFixed(1);
             updateRenFromYield();
         }
+        
+        function changeRenAppr(amount) {
+            triggerHaptic();
+            const input = document.getElementById('ren-appreciation');
+            let val = parseFloat(input.value) || 0;
+            let newVal = val + amount;
+            input.value = newVal.toFixed(1);
+            calculateRen();
+        }
 
         function updateRenFromYield() {
-            // Se cambio la %, calcolo l'affitto
             let Asset = parseFloat(document.getElementById('ren-asset-val').value)||0;
             let Yield = parseFloat(document.getElementById('ren-yield').value)||0;
-            
-            // Formula: Affitto Mensile = (Asset * Yield%) / 12
             let monthly = (Asset * (Yield / 100)) / 12;
             document.getElementById('ren-monthly').value = monthly.toFixed(0);
-            
-            // Poi lancio il calcolo totale
             calculateRen(true); 
         }
 
@@ -507,42 +526,67 @@
             let Invested = parseFloat(document.getElementById('ren-invested').value)||0;
             let Rent = parseFloat(document.getElementById('ren-monthly').value)||0;
             let years = parseFloat(document.getElementById('ren-years').value)||1;
+            let appreciation = parseFloat(document.getElementById('ren-appreciation').value)||0; // NEW
             let useInflation = document.getElementById('ren-inflation').checked;
             let useTax = document.getElementById('ren-tax').checked;
 
-            // Se l'utente cambia manualmente l'affitto, aggiorno la % Yield
             if(!skipYieldUpdate && Asset > 0) {
                  let yearlyRent = Rent * 12;
                  let calcYield = (yearlyRent / Asset) * 100;
                  document.getElementById('ren-yield').value = calcYield.toFixed(1);
             }
 
-            let cash = Rent * 12 * years;
-            if(useTax) cash = cash * 0.79; 
+            // CALCOLO LINEA TEMPORALE PER GRAFICO
+            let labels = []; let dataTot = []; let dataInv = [];
+            let months = years * 12;
             
-            let total = Asset + cash; 
+            let currentAsset = Asset;
+            let currentCash = 0;
+            let monthlyAppreciationRate = appreciation / 100 / 12;
 
+            for(let i=1; i<=months; i++) {
+                // Rivalutazione Asset
+                currentAsset = currentAsset * (1 + monthlyAppreciationRate);
+                
+                // Incasso Affitto
+                let monthlyRent = Rent;
+                if(useTax) monthlyRent = monthlyRent * 0.79;
+                currentCash += monthlyRent;
+
+                labels.push('');
+                dataTot.push(currentAsset + currentCash);
+                dataInv.push(Invested); // Linea piatta del capitale versato
+            }
+
+            let finalAsset = currentAsset;
+            let totalCash = currentCash;
+            let total = finalAsset + totalCash;
+
+            // INFLAZIONE SU TOTALE FINALE
             if(useInflation) {
                 total = total / Math.pow(1.02, years);
                 let factor = 1 / Math.pow(1.02, years);
-                Asset = Asset * factor;
-                cash = cash * factor;
+                finalAsset = finalAsset * factor;
+                totalCash = totalCash * factor;
             }
             
             let roi = 0;
             if (Invested > 0) roi = ((total - Invested) / Invested) * 100;
 
             document.getElementById('res-ren-total-val').innerText = fmt.format(total);
-            document.getElementById('res-ren-final-asset').innerText = fmt.format(Asset);
-            document.getElementById('res-ren-total-cash').innerText = fmt.format(cash);
+            document.getElementById('res-ren-final-asset').innerText = fmt.format(finalAsset);
+            document.getElementById('res-ren-total-cash').innerText = fmt.format(totalCash);
             document.getElementById('res-ren-invested-disp').innerText = fmt.format(Invested);
             document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
             
-            let chartLabels = renMode === 'pie' ? ['Asset', 'Cash'] : ['Start', 'End'];
-            let chartData1 = renMode === 'pie' ? [Asset, cash] : [Asset, total];
-            let chartColors = ['#8a701e', '#d4af37'];
+            let chartLabels = renMode === 'pie' ? ['Capitale Proprio', 'Profitto Totale'] : labels;
+            
+            // Pie chart logic: Invested vs Profit
+            let profit = total - Invested;
+            let chartData1 = renMode === 'pie' ? [Invested, profit] : dataTot;
+            let chartData2 = renMode === 'pie' ? null : dataInv;
 
-            updateChart('renChart', renMode, chartLabels, chartData1, null, chartColors);
+            updateChart('renChart', renMode, chartLabels, chartData1, chartData2, chartColors);
             updateComparison();
         }
 
@@ -587,21 +631,67 @@
             let instance = (id === 'pacChart') ? pacChart : renChart;
             if(instance) instance.destroy();
 
-            let bg1 = colors[0];
+            // Unified Gradient
+            let bg1 = colors[1]; // Green default for Pie
             if(mode === 'line') {
                 let gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                gradient.addColorStop(0, colors[0] + '66'); 
-                gradient.addColorStop(1, colors[0] + '00'); 
+                gradient.addColorStop(0, colors[1] + '66'); 
+                gradient.addColorStop(1, colors[1] + '00'); 
                 bg1 = gradient;
             }
 
             let config;
             if(mode === 'line') {
-                config = { type: 'line', data: { labels: labels, datasets: [ { data: data1, borderColor: colors[0], backgroundColor: bg1, fill: true, tension: 0.3, pointRadius: 0 }, ...(data2 ? [{ data: data2, borderColor: '#fff', borderDash:[5,5], pointRadius:0, borderWidth:1 }] : []) ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x:{display:false}, y:{display:false} }, interaction: { intersect: false, mode: 'index' } } };
+                config = { 
+                    type: 'line', 
+                    data: { 
+                        labels: labels, 
+                        datasets: [ 
+                            { 
+                                data: data1, // Total Value
+                                borderColor: colors[1], // Green
+                                backgroundColor: bg1, 
+                                fill: true, 
+                                tension: 0.3, 
+                                pointRadius: 0,
+                                borderWidth: 2
+                            }, 
+                            ...(data2 ? [{ 
+                                data: data2, // Invested
+                                borderColor: colors[0], // Grey
+                                borderDash: [5,5], 
+                                pointRadius: 0, 
+                                borderWidth: 1,
+                                fill: false
+                            }] : []) 
+                        ] 
+                    }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: { display: false } }, 
+                        scales: { x:{display:false}, y:{display:false} }, 
+                        interaction: { intersect: false, mode: 'index' } 
+                    } 
+                };
             } else {
-                let val1 = data2 ? data2[data2.length-1] : data1[0]; 
-                let val2 = data1[data1.length-1] - val1;
-                config = { type: 'doughnut', data: { labels: ['Base', 'Gain'], datasets: [{ data: [val1, val2], backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
+                // Pie: Data[0] = Invested (Grey), Data[1] = Profit (Green)
+                config = { 
+                    type: 'doughnut', 
+                    data: { 
+                        labels: labels, 
+                        datasets: [{ 
+                            data: data1, 
+                            backgroundColor: colors, // [Grey, Green]
+                            borderWidth: 0 
+                        }] 
+                    }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: { position: 'right', labels:{color:'#fff', font:{size:10}} } } 
+                    } 
+                };
             }
             let newChart = new Chart(ctx, config);
             if(id === 'pacChart') pacChart = newChart; else renChart = newChart;

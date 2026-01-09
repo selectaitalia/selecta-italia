@@ -13,13 +13,10 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
-      // 'debug_mode': true serve per vedere i dati SUBITO in DebugView
-      gtag('config', 'G-42QMLWNCQ1', { 'debug_mode': true });
+      gtag('config', 'G-42QMLWNCQ1');
     </script>
 
     <style>
-        /* COLORI BRAND SELECTA */
         :root {
             --bg-dark: #000810;
             --bg-card: #001f33;
@@ -36,7 +33,6 @@
             background: linear-gradient(180deg, #001220 0%, #000000 100%); 
             min-height: 100vh; 
             overscroll-behavior: none; 
-            /* Importante: permette lo scroll della pagina MA rispetta gli elementi interni */
             touch-action: pan-y; 
         }
         body {
@@ -74,18 +70,16 @@
         
         .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; cursor: pointer; }
 
-        /* --- SLIDER FIX V1.1 (SOLO CSS) --- */
+        /* --- SLIDER STILE --- */
         input[type=range] { 
             -webkit-appearance: none; 
             width: 100%; 
             background: transparent;
-            height: 40px; /* Area tocco grande */
+            height: 40px; 
             cursor: pointer;
             margin: 0;
             padding: 0;
-            /* Blocca lo scroll della pagina SOLO se tocchi lo slider */
-            touch-action: none !important; 
-            z-index: 10;
+            /* La logica touch è ora gestita da JS */
         }
         input[type=range]:focus { outline: none; }
         
@@ -374,7 +368,7 @@
         © Selecta Italia - Tutti i diritti riservati.
     </div>
     
-    <div class="version-tag">v1.1 - Debug Mode</div>
+    <div class="version-tag">v1.2 - Touch Override</div>
     <div style="height: 20px;"></div>
 
     <script>
@@ -659,7 +653,43 @@
             el.addEventListener('change', calculateAll);
         });
 
-        // NESSUN JS PER IL TOUCH QUI: USIAMO SOLO IL CSS
+        // --- SOLUZIONE NUCLEARE: GESTIONE MANUALE DEL TOCCO ---
+        // Questo script intercetta il tocco e "sposta" manualmente il valore dello slider
+        // ignorando il comportamento difettoso del browser.
+        const allRanges = document.querySelectorAll('input[type="range"]');
+        
+        allRanges.forEach(range => {
+            const updateSlider = (touchEvent) => {
+                touchEvent.preventDefault(); // Blocca lo scroll della pagina
+                const rect = range.getBoundingClientRect();
+                const touchX = touchEvent.touches[0].clientX;
+                
+                // Calcola la percentuale del tocco rispetto alla larghezza dello slider
+                let percent = (touchX - rect.left) / rect.width;
+                if (percent < 0) percent = 0;
+                if (percent > 1) percent = 1;
+
+                const min = parseFloat(range.min);
+                const max = parseFloat(range.max);
+                const step = parseFloat(range.step);
+                
+                // Calcola il nuovo valore grezzo
+                let rawValue = min + (percent * (max - min));
+                
+                // Arrotonda al "step" più vicino
+                let newValue = Math.round(rawValue / step) * step;
+                
+                // Aggiorna il valore se è cambiato
+                if(range.value != newValue) {
+                    range.value = newValue;
+                    // Scatena l'evento "input" per far ricalcolare i grafici
+                    range.dispatchEvent(new Event('input'));
+                }
+            };
+
+            range.addEventListener('touchstart', updateSlider, {passive: false});
+            range.addEventListener('touchmove', updateSlider, {passive: false});
+        });
     </script>
 </body>
 </html>

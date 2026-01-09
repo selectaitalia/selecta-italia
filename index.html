@@ -45,7 +45,7 @@
         }
         .logo-img { 
             width: 100%; 
-            max-width: 180px; /* Dimensione logo controllata */
+            max-width: 180px; 
             height: auto; 
             display: block;
             filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); 
@@ -120,16 +120,57 @@
         .comp-header { font-size: 12px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 5px; }
         .comp-val { font-size: 20px; font-weight: 700; color: #fff; }
 
-        /* FOOTER & CTA (BOTTONE RIDIMENSIONATO) */
+        /* --- NUOVO: BOX REFERRAL PARTNER (SINGLE) --- */
+        .partner-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .partner-label {
+            font-size: 11px;
+            color: var(--text-sec);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        /* Stile Bottone Unico Gold */
+        .partner-btn-gold {
+            background: linear-gradient(45deg, #111, #222);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            margin-bottom: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .partner-btn-gold:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 15px rgba(212,175,55,0.4);
+            transform: translateY(-2px);
+        }
+        .partner-btn-gold strong { font-weight: 800; }
+
+        /* FOOTER & CTA */
         .cta-btn { 
             background: linear-gradient(90deg, var(--accent), #f0e68c); 
             color: #000; 
-            width: 90%; /* Non più 100%, lascia spazio ai lati */
-            max-width: 350px; /* Non diventa gigante su schermi larghi */
-            padding: 14px; /* Meno alto */
+            width: 90%; 
+            max-width: 350px;
+            padding: 14px; 
             border-radius: 12px; 
             border: none; 
-            font-size: 14px; /* Font più elegante */
+            font-size: 14px; 
             font-weight: 800; 
             cursor: pointer; 
             box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); 
@@ -137,7 +178,7 @@
             display: block; 
             text-align: center; 
             text-transform: uppercase; 
-            margin: 25px auto 10px auto; /* Centrato con margine */
+            margin: 25px auto 10px auto; 
             transition: transform 0.1s; 
         }
         .cta-btn:active { transform: scale(0.98); }
@@ -206,6 +247,14 @@
                     <div><div class="res-item-small">Versato</div><div class="res-val-small" id="res-pac-invested">€ 0</div></div>
                     <div><div class="res-item-small">Gain</div><div class="res-val-small text-green" id="res-pac-gain">€ 0</div></div>
                 </div>
+
+                <div class="partner-section">
+                    <div class="partner-label">⚡ Inizia ora il tuo PAC:</div>
+                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold">
+                        <span>Apri su <strong>Trade Republic</strong></span> ↗️
+                    </a>
+                </div>
+
             </div>
 
             <div class="decumulo-box">
@@ -317,6 +366,14 @@
                         <div class="res-val-small" id="res-ren-yield">0%</div>
                     </div>
                 </div>
+
+                 <div class="partner-section">
+                    <div class="partner-label">⚡ Ottieni il 3.75% sulla liquidità:</div>
+                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold">
+                        <span>Attiva su <strong>Trade Republic</strong></span> ↗️
+                    </a>
+                </div>
+
             </div>
             
             <div class="decumulo-box" style="margin-top:0;">
@@ -369,6 +426,7 @@
         I risultati "netti" sono stime basate sulla normativa fiscale italiana vigente (es. 26% su plusvalenze finanziarie standard, 21% cedolare secca), che potrebbe variare nel tempo. 
         L'inflazione è calcolata come perdita di potere d'acquisto stimata (2%). 
         Il calcolo del decumulo assume una tassazione pro-quota sul guadagno maturato.
+        L'utilizzo dei link partner contribuisce al supporto del progetto.
         <br><br>
         © Selecta Italia - Tutti i diritti riservati.
     </div>

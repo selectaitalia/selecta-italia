@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Selecta Italia Financial Suite</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* COLORI BRAND SELECTA */
+        :root {
+            --bg-dark: #000810;
+            --bg-card: #001f33;
+            --accent: #d4af37; /* Oro Selecta */
+            --accent-dim: #8a701e;
+            --text-main: #ffffff;
+            --text-sec: #8aaec4;
+            --success: #00e676; 
+            --danger: #ff5252;
+            --warning: #ffab00;
+        }
+
+        /* STRUTTURA GENERALE */
+        html { 
+            background: linear-gradient(180deg, #001220 0%, #000000 100%); 
+            min-height: 100vh; 
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0 auto; 
+            padding: 15px; 
+            color: var(--text-main);
+            max-width: 500px; /* Ottimizzato per PC */
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* HEADER */
+        .header { text-align: center; margin-bottom: 20px; margin-top: 10px; }
+        .logo-img { width: 100%; max-width: 160px; height: auto; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); }
+
+        /* TAB DI NAVIGAZIONE */
+        .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-sec); font-weight: 600; font-size: 13px; cursor: pointer; border-radius: 8px; transition: all 0.3s; }
+        .tab-btn.active { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(212,175,55,0.4); }
+        
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS (CONTENITORI) */
+        .card { background-color: var(--bg-card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin-bottom: 25px; border: 1px solid rgba(212, 175, 55, 0.15); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+
+        /* INPUTS E SLIDER */
+        .input-group { margin-bottom: 20px; }
+        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        label { font-size: 13px; color: var(--text-sec); }
+        
+        .value-display { font-family: 'Roboto Mono', monospace; font-weight: 700; color: #fff; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px; font-size: 14px; min-width: 80px; text-align: right; border: 1px solid rgba(255,255,255,0.1); }
+        .value-display input { background: transparent; border: none; color: inherit; width: 70px; text-align: right; outline: none; padding: 0; margin: 0; }
+        
+        /* Dropdown Tasse */
+        .tax-select {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff;
+            border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; cursor: pointer;
+        }
+
+        /* Slider Custom */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 3px; }
+        input[type=range]::-webkit-slider-thumb { height: 22px; width: 22px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px rgba(212,175,55,0.5); margin-top: -8px; border: 2px solid #000; }
+
+        /* SWITCH INFLAZIONE */
+        .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+        /* BOX RISULTATI */
+        .results-box { background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .res-label { font-size: 11px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; }
+        .res-value-main { font-size: 26px; font-weight: 800; color: #fff; margin: 5px 0; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; text-align: left; }
+        .res-item-small { font-size: 11px; color: var(--text-sec); }
+        .res-val-small { font-size: 14px; font-weight: 700; color: #fff; }
+        .text-green { color: var(--success); }
+        .text-red { color: var(--danger); }
+        .text-gold { color: var(--accent); }
+
+        /* BOX DECUMULO */
+        .decumulo-box { background: linear-gradient(135deg, rgba(212,175,55,0.05), rgba(0,0,0,0)); border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; padding: 15px; margin-top: 20px; }
+        .decumulo-header { font-size: 13px; font-weight: bold; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap:5px; }
+
+        /* CHART WRAPPER */
+        .chart-controls { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 10px; }
+        .chart-btn { background: rgba(255,255,255,0.1); border: none; color: var(--text-sec); padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 11px; }
+        .chart-btn.active { background: var(--accent); color: #000; }
+        .chart-wrapper { position: relative; height: 220px; width: 100%; }
+
+        /* BOX CONFRONTO */
+        .comp-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid #fff; }
+        .comp-header { font-size: 12px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 5px; }
+        .comp-val { font-size: 20px; font-weight: 700; color: #fff; }
+
+        /* FOOTER & CTA */
+        .cta-btn { background: linear-gradient(90deg, var(--accent), #f0e68c); color: #000; width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); text-decoration: none; display: block; text-align: center; text-transform: uppercase; margin-top: 20px; transition: transform 0.1s; }
+        .cta-btn:active { transform: scale(0.98); }
+        
+        .reset-link { display: block; text-align: center; margin-top: 25px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
+
+        hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0; }
+        
+        /* DISCLAIMER STYLE */
+        .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="1000072083.jpg" alt="SELECTA ITALIA" class="logo-img">
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('pac')">Piano Accumulo</button>
+        <button class="tab-btn" onclick="openTab('rendita')">Rendita / Asset</button>
+        <button class="tab-btn" onclick="openTab('confronto')">Confronto</button>
+    </div>
+
+    <div id="pac" class="tab-content active">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📈 PAC & Decumulo</div>
+                <div class="chart-controls">
+                    <button class="chart-btn active" onclick="setChartMode('pac', 'line')">Linea</button>
+                    <button class="chart-btn" onclick="setChartMode('pac', 'pie')">Torta</button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <div class="label-row"><label>Capitale Iniziale</label><div class="value-display">€ <input type="number" id="pac-initial" value="5000" oninput="sync('pac','initial')"></div></div>
+                <input type="range" id="rng-pac-initial" min="0" max="100000" step="500" value="5000" oninput="sync('pac','initial')">
+            </div>
+            <div class="input-group">
+                <div class="label-row"><label>Versamento Mensile</label><div class="value-display">€ <input type="number" id="pac-monthly" value="400" oninput="sync('pac','monthly')"></div></div>
+                <input type="range" id="rng-pac-monthly" min="0" max="5000" step="50" value="400" oninput="sync('pac','monthly')">
+            </div>
+            <div class="input-group">
+                <div class="label-row"><label>Anni Accumulo</label><div class="value-display"><input type="number" id="pac-years" value="15" oninput="sync('pac','years')"></div></div>
+                <input type="range" id="rng-pac-years" min="1" max="40" step="1" value="15" oninput="sync('pac','years')">
+            </div>
+            <div class="input-group">
+                <div class="label-row"><label>Rendimento %</label><div class="value-display"><input type="number" id="pac-rate" value="8" oninput="sync('pac','rate')"></div></div>
+                <input type="range" id="rng-pac-rate" min="1" max="20" step="0.5" value="8" oninput="sync('pac','rate')">
+            </div>
+            
+             <div class="switch-container">
+                <div style="font-size:12px; color:#aaa;">Calcola Inflazione (Reale)</div>
+                <label class="switch"><input type="checkbox" id="pac-inflation" onchange="calculatePAC()"><span class="slider"></span></label>
+            </div>
+            <div class="input-group" style="margin-top:15px">
+                <div class="label-row"><label>Costi Una Tantum (Ingresso)</label><div class="value-display">€ <input type="number" id="pac-fees" value="0" oninput="calculatePAC()"></div></div>
+            </div>
+
+            <div class="results-box">
+                <div class="res-label" id="pac-total-label">Montante Finale Lordo</div>
+                <div class="res-value-main" id="res-pac-gross">€ 0</div>
+                <div style="font-size:12px; color:var(--text-sec); margin-bottom:10px;">Potere d'acquisto: <span id="res-pac-real">---</span></div>
+                
+                <div class="res-grid" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <div><div class="res-item-small">Versato</div><div class="res-val-small" id="res-pac-invested">€ 0</div></div>
+                    <div><div class="res-item-small">Gain</div><div class="res-val-small text-green" id="res-pac-gain">€ 0</div></div>
+                </div>
+            </div>
+
+            <div class="decumulo-box">
+                <div class="decumulo-header">
+                    <span>🔄 Fase di Ritiro (Post-Piano)</span>
+                    <select id="pac-tax-rate" class="tax-select" onchange="calculatePAC()">
+                        <option value="26">26% ETF/Azioni</option>
+                        <option value="12.5">12.5% BTP/Bond</option>
+                    </select>
+                </div>
+                
+                <div class="input-group" style="margin-bottom:10px;">
+                    <div class="label-row"><label>Ritiro Mensile LORDO</label><div class="value-display">€ <input type="number" id="pac-withdraw-gross" value="0" oninput="calculatePAC()"></div></div>
+                    <div style="font-size:10px; color:#aaa;">Quanto vuoi prelevare dal capitale ogni mese?</div>
+                </div>
+
+                <div class="res-grid" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+                    <div><div class="res-item-small">Tasse (Pro-Quota)</div><div class="res-val-small text-red" id="res-pac-tax-monthly">€ 0</div></div>
+                    <div><div class="res-item-small">Netto in Tasca</div><div class="res-val-small text-green" style="font-size:16px;" id="res-pac-net-monthly">€ 0</div></div>
+                </div>
+                
+                <div style="margin-top:10px; text-align:center;">
+                    <div class="res-item-small">Durata Stimata Capitale</div>
+                    <div id="res-pac-duration" style="font-weight:bold; color:var(--accent);">---</div>
+                </div>
+            </div>
+
+            <div class="chart-wrapper" style="margin-top:20px;">
+                <canvas id="pacChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="rendita" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🏠 Rendita Asset</div>
+                <div class="chart-controls">
+                    <button class="chart-btn active" onclick="setChartMode('ren', 'line')">Linea</button>
+                    <button class="chart-btn" onclick="setChartMode('ren', 'pie')">Torta</button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="label-row"><label>Valore Totale Asset</label><div class="value-display">€ <input type="number" id="ren-asset-val" value="200000" oninput="sync('ren','asset-val')"></div></div>
+                <input type="range" id="rng-ren-asset-val" min="10000" max="1000000" step="5000" value="200000" oninput="sync('ren','asset-val')">
+                <div style="font-size:10px; color:#aaa; margin-top:2px;">Es. Valore immobile o portafoglio azioni</div>
+            </div>
+            
+            <div class="input-group">
+                <div class="label-row"><label>Capitale Tuo Investito</label><div class="value-display">€ <input type="number" id="ren-invested" value="50000" oninput="sync('ren','invested')"></div></div>
+                <input type="range" id="rng-ren-invested" min="0" max="500000" step="5000" value="50000" oninput="sync('ren','invested')">
+                <div style="font-size:10px; color:#aaa; margin-top:2px;">Es. Soldi sborsati realmente di tasca tua</div>
+            </div>
+
+            <div class="input-group">
+                <div class="label-row"><label>Costi Una Tantum</label><div class="value-display">€ <input type="number" id="ren-fees" value="5000" oninput="calculateRen()"></div></div>
+            </div>
+
+            <hr style="margin:15px 0; border-color:rgba(255,255,255,0.05);">
+
+            <div class="input-group">
+                <div class="label-row"><label>Rendita Mensile LORDA</label><div class="value-display">€ <input type="number" id="ren-monthly" value="800" oninput="sync('ren','monthly')"></div></div>
+                <input type="range" id="rng-ren-monthly" min="100" max="5000" step="50" value="800" oninput="sync('ren','monthly')">
+                <div style="font-size:10px; color:#aaa; margin-top:2px;">Affitto o Dividendi (Totale Annuo / 12)</div>
+            </div>
+
+            <div class="input-group">
+                <div class="label-row"><label>Rivalutazione Annua %</label><div class="value-display"><input type="number" id="ren-growth" value="1.5" oninput="sync('ren','growth')"> %</div></div>
+                <input type="range" id="rng-ren-growth" min="0" max="10" step="0.5" value="1.5" oninput="sync('ren','growth')">
+            </div>
+
+            <div class="switch-container">
+                <div style="font-size:12px; color:#aaa;">Calcola Inflazione</div>
+                <label class="switch"><input type="checkbox" id="ren-inflation" onchange="calculateRen()"><span class="slider"></span></label>
+            </div>
+            
+            <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
+                <label>Regime Fiscale:</label>
+                <select id="ren-tax-rate" class="tax-select" onchange="calculateRen()">
+                    <option value="21">21% Cedolare Secca</option>
+                    <option value="10">10% Canone Conc.</option>
+                    <option value="26">26% Finanziaria</option>
+                    <option value="43">43% IRPEF Scaglione</option>
+                </select>
+            </div>
+            <div class="input-group" style="margin-top:10px;">
+                <div class="label-row"><label>Anni</label><div class="value-display"><input type="number" id="ren-years" value="15" oninput="sync('ren','years')"></div></div>
+                <input type="range" id="rng-ren-years" min="1" max="40" step="1" value="15" oninput="sync('ren','years')">
+            </div>
+
+            <div class="results-box">
+                <div class="res-label">Ricchezza Totale Generata (Netta)</div>
+                <div class="res-value-main" id="res-ren-total-val">€ 0</div>
+                <div style="font-size:12px; color:var(--text-sec); margin-bottom:10px;">Potere d'acquisto: <span id="res-ren-real">---</span></div>
+
+                <div class="res-grid">
+                    <div><div class="res-item-small">Valore Asset Finale</div><div class="res-val-small" id="res-ren-final-asset">€ 0</div></div>
+                    <div><div class="res-item-small">Cashflow Netto Tot</div><div class="res-val-small text-green" id="res-ren-total-cash">€ 0</div></div>
+                </div>
+                
+                <div style="margin-top:15px; display:flex; justify-content:space-around; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
+                    <div>
+                        <div class="res-item-small">ROI (su investito)</div>
+                        <div class="res-val-small text-gold" id="res-ren-roi">0%</div>
+                    </div>
+                    <div>
+                        <div class="res-item-small">Yield (su asset)</div>
+                        <div class="res-val-small" id="res-ren-yield">0%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="decumulo-box" style="margin-top:0;">
+                <div class="res-grid" style="grid-template-columns: 1fr 1fr; border:none; padding:0;">
+                    <div><div class="res-item-small">Incasso Netto/Mese</div><div class="res-val-small text-green" id="res-ren-monthly-net">€ 0</div></div>
+                    <div><div class="res-item-small">Tasse Mensili</div><div class="res-val-small text-red" id="res-ren-monthly-tax">€ 0</div></div>
+                </div>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="renChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="confronto" class="tab-content">
+        <div class="card">
+            <div class="card-title" style="margin-bottom:20px; text-align:center;">🆚 Analisi Finale</div>
+            <p style="text-align:center; font-size:12px; color:var(--text-sec);">Confronto a <span id="comp-years">15</span> anni</p>
+
+            <div class="comp-box" style="border-color: #2979ff;">
+                <div class="comp-header">Strategia PAC</div>
+                <div class="res-grid">
+                    <div><div class="res-item-small">Capitale Finale</div><div class="comp-val" id="comp-pac-end">€ 0</div></div>
+                    <div><div class="res-item-small">Capitale Investito</div><div class="res-val-small" id="comp-pac-inv">€ 0</div></div>
+                </div>
+            </div>
+
+            <div class="comp-box" style="border-color: #d4af37;">
+                <div class="comp-header">Strategia Rendita</div>
+                <div class="res-grid">
+                    <div><div class="res-item-small">Valore Totale</div><div class="comp-val" id="comp-ren-end">€ 0</div></div>
+                    <div><div class="res-item-small">Capitale Sborsato</div><div class="res-val-small" id="comp-ren-inv">€ 0</div></div>
+                </div>
+            </div>
+
+            <div style="background:rgba(0,230,118,0.1); padding:15px; border-radius:10px; margin-top:20px; text-align:center;">
+                <div class="res-item-small">VINCITORE (RICCHEZZA TOTALE)</div>
+                <div id="comp-winner-text" style="font-size:18px; font-weight:800; color:var(--success); margin-top:5px;">---</div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <a href="https://t.me/selectaitalia" class="cta-btn">💎 Canale @selectaitalia</a>
+    <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
+
+    <div class="disclaimer">
+        <strong>DISCLAIMER:</strong> I calcoli sono puramente indicativi e basati su proiezioni matematiche costanti. Non costituiscono consulenza finanziaria né garanzia di rendimento futuro. 
+        I risultati "netti" sono stime basate sulla normativa fiscale italiana vigente (es. 26% su plusvalenze finanziarie standard, 21% cedolare secca), che potrebbe variare nel tempo. 
+        L'inflazione è calcolata come perdita di potere d'acquisto stimata (2%). 
+        Il calcolo del decumulo assume una tassazione pro-quota sul guadagno maturato.
+        <br><br>
+        © Selecta Italia - Tutti i diritti riservati.
+    </div>
+    
+    <div style="height: 20px;"></div> <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let pacChart = null;
+        let renChart = null;
+        let pacMode = 'line';
+        let renMode = 'line';
+        const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+
+        // --- SISTEMA SALVATAGGIO DATI (Local Storage) ---
+        function saveData() {
+            const inputs = document.querySelectorAll('input, select');
+            let data = {};
+            inputs.forEach(el => {
+                if(el.id) {
+                    if(el.type === 'checkbox') data[el.id] = el.checked;
+                    else data[el.id] = el.value;
+                }
+            });
+            localStorage.setItem('selectaData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('selectaData'));
+            if(data) {
+                for (const [key, value] of Object.entries(data)) {
+                    const el = document.getElementById(key);
+                    if(el) {
+                        if(el.type === 'checkbox') el.checked = value;
+                        else el.value = value;
+                    }
+                }
+            }
+            // Aggiorna tutti gli slider visivamente
+            document.querySelectorAll('input[type=range]').forEach(rng => {
+                const idNum = rng.id.replace('rng-', '');
+                const inp = document.getElementById(idNum);
+                if(inp) rng.value = inp.value;
+            });
+        }
+
+        function clearData() {
+            if(confirm('Vuoi resettare tutti i dati ai valori iniziali?')) {
+                localStorage.removeItem('selectaData');
+                location.reload();
+            }
+        }
+
+        // --- FUNZIONI CORE ---
+
+        function openTab(id) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+            if(id === 'confronto') updateComparison();
+        }
+
+        function setChartMode(chart, mode) {
+            if(chart === 'pac') { pacMode = mode; calculatePAC(); }
+            if(chart === 'ren') { renMode = mode; calculateRen(); }
+            let parent = event.target.parentElement;
+            parent.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function sync(group, id) {
+            let rng = document.getElementById(`rng-${group}-${id}`);
+            let inp = document.getElementById(`${group}-${id}`);
+            if(document.activeElement === rng) inp.value = rng.value;
+            else rng.value = inp.value;
+            
+            calculateAll();
+        }
+
+        function calculateAll() {
+            calculatePAC();
+            calculateRen();
+            saveData(); 
+        }
+
+        // --- CALCOLO PAC ---
+        function calculatePAC() {
+            let P = parseFloat(document.getElementById('pac-initial').value) || 0;
+            let PMT = parseFloat(document.getElementById('pac-monthly').value) || 0;
+            let years = parseFloat(document.getElementById('pac-years').value) || 1;
+            let rate = (parseFloat(document.getElementById('pac-rate').value) || 0) / 100;
+            let entryFees = parseFloat(document.getElementById('pac-fees').value) || 0;
+            let useInflation = document.getElementById('pac-inflation').checked;
+            let withdrawGross = parseFloat(document.getElementById('pac-withdraw-gross').value) || 0;
+            let taxRate = parseFloat(document.getElementById('pac-tax-rate').value) / 100;
+
+            let inflationRate = useInflation ? 0.02 : 0;
+            let months = years * 12;
+            let monthlyRate = rate / 12;
+            
+            let currentTotal = P - entryFees;
+            let currentInvested = P;
+
+            let labels = [];
+            let dataInv = [];
+            let dataTot = [];
+
+            for(let i=1; i<=months; i++){
+                currentTotal = (currentTotal + PMT) * (1 + monthlyRate);
+                currentInvested += PMT;
+                labels.push(`A${Math.ceil(i/12)}`);
+                dataInv.push(currentInvested);
+                dataTot.push(currentTotal);
+            }
+
+            let grossFinal = currentTotal;
+            let gainTotal = grossFinal - currentInvested;
+            let realValue = grossFinal / Math.pow(1 + inflationRate, years);
+
+            // LOGICA DECUMULO: Calcolo Tasse Pro-Quota sul prelievo
+            // Gain Ratio = La percentuale di guadagno nel capitale totale
+            let gainRatio = (gainTotal > 0 && grossFinal > 0) ? (gainTotal / grossFinal) : 0;
+            
+            // Su ogni prelievo mensile, solo la parte relativa al gain è tassata
+            let taxablePart = withdrawGross * gainRatio;
+            let taxAmount = taxablePart * taxRate;
+            let netWithdrawal = withdrawGross - taxAmount;
+
+            let sustainabilityText = "Nessun prelievo";
+            if(withdrawGross > 0) {
+                // Simulazione esaurimento
+                let tempCap = grossFinal;
+                let monthsLast = 0;
+                while(tempCap > 0 && monthsLast < 600) { 
+                    tempCap = tempCap * (1 + monthlyRate) - withdrawGross;
+                    monthsLast++;
+                }
+                if(monthsLast >= 600) sustainabilityText = "Perpetuo (>50 anni) ♾️";
+                else {
+                    let y = Math.floor(monthsLast/12);
+                    let m = monthsLast%12;
+                    sustainabilityText = `Esaurimento in ${y} anni e ${m} mesi`;
+                }
+            }
+
+            // Aggiornamento UI PAC
+            document.getElementById('res-pac-gross').innerText = fmt.format(grossFinal);
+            document.getElementById('res-pac-invested').innerText = fmt.format(currentInvested);
+            document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
+            document.getElementById('res-pac-real').innerText = useInflation ? fmt.format(realValue) : "Non attivo";
+            
+            document.getElementById('res-pac-tax-monthly').innerText = fmt.format(taxAmount);
+            document.getElementById('res-pac-net-monthly').innerText = fmt.format(netWithdrawal);
+            document.getElementById('res-pac-duration').innerText = sustainabilityText;
+
+            updateChart('pacChart', pacMode, labels, dataInv, dataTot, ['#2979ff', '#00e676']);
+            updateComparison();
+            saveData();
+        }
+
+        // --- CALCOLO RENDITA ---
+        function calculateRen() {
+            let AssetVal = parseFloat(document.getElementById('ren-asset-val').value) || 0;
+            let Invested = parseFloat(document.getElementById('ren-invested').value) || 0;
+            let Fees = parseFloat(document.getElementById('ren-fees').value) || 0;
+            let RentGross = parseFloat(document.getElementById('ren-monthly').value) || 0;
+            let years = parseFloat(document.getElementById('ren-years').value) || 1;
+            let growth = (parseFloat(document.getElementById('ren-growth').value) || 0) / 100;
+            let taxRate = parseFloat(document.getElementById('ren-tax-rate').value) / 100;
+            let useInflation = document.getElementById('ren-inflation').checked;
+            
+            let inflationRate = useInflation ? 0.02 : 0;
+            
+            let RentTax = RentGross * taxRate;
+            let RentNet = RentGross - RentTax;
+            let totalInvestedReal = Invested + Fees;
+
+            let labels = [];
+            let dataAsset = [];
+            let dataTotalWealth = [];
+            
+            let currentAsset = AssetVal;
+            let currentCashAcc = 0;
+
+            for(let i=1; i<=years; i++){
+                currentAsset = currentAsset * (1 + growth);
+                currentCashAcc += (RentNet * 12);
+                
+                labels.push(`Anno ${i}`);
+                dataAsset.push(currentAsset);
+                dataTotalWealth.push(currentAsset + currentCashAcc);
+            }
+
+            let finalWealth = currentAsset + currentCashAcc;
+            let realWealth = finalWealth / Math.pow(1 + inflationRate, years);
+
+            let roi = totalInvestedReal > 0 ? ((RentNet * 12) / totalInvestedReal) * 100 : 0;
+            let yieldVal = AssetVal > 0 ? ((RentNet * 12) / AssetVal) * 100 : 0;
+
+            // Aggiornamento UI Rendita
+            document.getElementById('res-ren-total-val').innerText = fmt.format(finalWealth);
+            document.getElementById('res-ren-real').innerText = useInflation ? fmt.format(realWealth) : "Non attivo";
+            document.getElementById('res-ren-final-asset').innerText = fmt.format(currentAsset);
+            document.getElementById('res-ren-total-cash').innerText = fmt.format(currentCashAcc);
+            
+            document.getElementById('res-ren-monthly-net').innerText = fmt.format(RentNet);
+            document.getElementById('res-ren-monthly-tax').innerText = fmt.format(RentTax);
+            
+            document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
+            document.getElementById('res-ren-yield').innerText = yieldVal.toFixed(1) + "%";
+
+            let dataChart2 = renMode === 'line' ? dataTotalWealth : [currentCashAcc]; 
+            let dataChart1 = renMode === 'line' ? dataAsset : [currentAsset];
+            
+            updateChart('renChart', renMode, labels, dataChart1, dataChart2, ['#d4af37', '#00e676']);
+            updateComparison();
+            saveData();
+        }
+
+        // --- CONFRONTO ---
+        function updateComparison() {
+            document.getElementById('comp-years').innerText = document.getElementById('pac-years').value;
+            
+            let pacEnd = document.getElementById('res-pac-gross').innerText;
+            let renEnd = document.getElementById('res-ren-total-val').innerText;
+            let pacInv = document.getElementById('res-pac-invested').innerText;
+            let renInvVal = (parseFloat(document.getElementById('ren-invested').value)||0) + (parseFloat(document.getElementById('ren-fees').value)||0);
+            
+            document.getElementById('comp-pac-end').innerText = pacEnd;
+            document.getElementById('comp-ren-end').innerText = renEnd;
+            document.getElementById('comp-pac-inv').innerText = pacInv;
+            document.getElementById('comp-ren-inv').innerText = fmt.format(renInvVal);
+
+            let vPac = parseLocaleNum(pacEnd);
+            let vRen = parseLocaleNum(renEnd);
+            
+            let winner = vPac > vRen ? "STRATEGIA PAC 🏆" : (vRen > vPac ? "STRATEGIA RENDITA 🏆" : "PAREGGIO");
+            document.getElementById('comp-winner-text').innerText = winner;
+        }
+
+        function parseLocaleNum(str) { return parseFloat(str.replace(/[^0-9,-]+/g,"").replace(',','.')); }
+
+        // --- GESTIONE GRAFICI ---
+        function updateChart(canvasId, mode, labels, data1, data2, colors) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            let instance = (canvasId === 'pacChart') ? pacChart : renChart;
+            if(instance) instance.destroy();
+
+            let datasets = [];
+            if(mode === 'line') {
+                datasets = [
+                    {
+                        label: canvasId==='pacChart'?'Montante Totale':'Ricchezza Totale',
+                        data: data2, borderColor: colors[1], backgroundColor: colors[1]+'33',
+                        fill: true, tension: 0.4, pointRadius: 0
+                    },
+                    {
+                        label: canvasId==='pacChart'?'Versato':'Valore Asset',
+                        data: data1, borderColor: colors[0], backgroundColor: colors[0]+'33',
+                        fill: true, tension: 0.4, pointRadius: 0
+                    }
+                ];
+            } else {
+                let l1, l2, val1, val2;
+                if(canvasId === 'pacChart') {
+                    let total = data2[data2.length-1];
+                    let inv = data1[data1.length-1];
+                    val1 = inv; val2 = total - inv;
+                    l1 = 'Versato'; l2 = 'Interessi';
+                } else {
+                    let assetFinal = data1[data1.length-1];
+                    let wealthFinal = data2[data2.length-1];
+                    val1 = assetFinal; 
+                    val2 = wealthFinal - assetFinal; 
+                    l1 = 'Asset'; l2 = 'Cash Incassato';
+                }
+                datasets = [{ data: [val1, val2], backgroundColor: colors, borderWidth: 0 }];
+                labels = [l1, l2];
+            }
+
+            let newChart = new Chart(ctx, {
+                type: mode === 'line' ? 'line' : 'doughnut',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: mode==='pie', labels:{color:'#ccc'} } },
+                    scales: mode==='line'?{ x:{display:false}, y:{display:true, ticks:{color:'#888', callback:v=>'€'+v/1000+'k'}, grid:{color:'#ffffff11'}} } : {x:{display:false}, y:{display:false}}
+                }
+            });
+
+            if(canvasId === 'pacChart') pacChart = newChart;
+            else renChart = newChart;
+        }
+
+        // Init: Carica dati e avvia
+        loadData();
+        calculateAll();
+
+        // Listener globale per aggiornare al cambio di qualsiasi input
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('input', () => { if(el.type !== 'range') calculateAll(); });
+            el.addEventListener('change', calculateAll);
+        });
+
+    </script>
+</body>
+</html>

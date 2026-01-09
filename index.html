@@ -4,8 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Selecta Italia | Suite Finanziaria</title>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-42QMLWNCQ1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-42QMLWNCQ1');
+    </script>
+
     <style>
         /* COLORI BRAND SELECTA */
         :root {
@@ -24,8 +35,8 @@
         html { 
             background: linear-gradient(180deg, #001220 0%, #000000 100%); 
             min-height: 100vh; 
-            overscroll-behavior: none; 
-            touch-action: pan-y; 
+            overscroll-behavior: none; /* Impedisce il rimbalzo su iOS */
+            touch-action: pan-y; /* Permette lo scroll verticale ma blocca zoom e orizzontale */
         }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -35,6 +46,7 @@
             max-width: 500px; /* Ottimizzato per PC */
             min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
+            padding-bottom: 50px; /* Spazio extra in fondo per scroll */
         }
 
         /* HEADER & LOGO */
@@ -67,7 +79,7 @@
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
 
-        /* INPUTS E SLIDER - FIX TOUCH MOBILE */
+        /* INPUTS E SLIDER */
         .input-group { margin-bottom: 20px; }
         .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         label { font-size: 13px; color: var(--text-sec); }
@@ -80,15 +92,17 @@
             border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; cursor: pointer;
         }
 
-        /* --- SLIDER FIX PER MOBILE (CSS AVANZATO) --- */
+        /* --- SLIDER FIX PER MOBILE (FORCE TOUCH) --- */
         input[type=range] { 
             -webkit-appearance: none; 
             width: 100%; 
             background: transparent;
-            height: 40px; 
+            height: 40px; /* Area di tocco aumentata */
             cursor: pointer;
             margin: 0;
             padding: 0;
+            display: block;
+            /* Forza il browser a ignorare lo scroll quando si tocca qui */
             touch-action: none !important; 
         }
         input[type=range]:focus { outline: none; }
@@ -108,7 +122,7 @@
             border-radius: 50%; 
             background: var(--accent); 
             box-shadow: 0 0 10px rgba(212,175,55,0.5); 
-            margin-top: -9px; 
+            margin-top: -9px; /* Centratura precisa */
             border: 2px solid #000; 
             -webkit-appearance: none;
         }
@@ -179,6 +193,7 @@
             width: 100%;
             box-sizing: border-box;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer; /* Importante per tracking */
         }
         .partner-btn-gold:hover {
             background: var(--accent);
@@ -277,7 +292,8 @@
 
                 <div class="partner-section">
                     <div class="partner-label">⚡ Inizia ora il tuo PAC:</div>
-                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold">
+                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold" 
+                       onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_pac'});">
                         <span>Apri su <strong>Trade Republic</strong></span> ↗️
                     </a>
                 </div>
@@ -396,7 +412,8 @@
 
                  <div class="partner-section">
                     <div class="partner-label">⚡ Ottieni il 3.75% sulla liquidità:</div>
-                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold">
+                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold"
+                       onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_ren'});">
                         <span>Attiva su <strong>Trade Republic</strong></span> ↗️
                     </a>
                 </div>
@@ -751,9 +768,10 @@
             el.addEventListener('change', calculateAll);
         });
 
-        // --- FIX FINALE TOUCH MOBILE ---
-        // Forza lo slider a rispondere anche se il browser vorrebbe scrollare
-        document.querySelectorAll('input[type="range"]').forEach(range => {
+        // --- FIX FINALE TOUCH MOBILE (FORCE EVENT) ---
+        // Forza lo slider a prendersi la priorità assoluta sul tocco
+        const ranges = document.querySelectorAll('input[type="range"]');
+        ranges.forEach(range => {
             range.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: false});
             range.addEventListener('touchmove', function(e) { e.stopPropagation(); }, {passive: false});
         });

@@ -40,7 +40,11 @@
             -webkit-tap-highlight-color: transparent;
             padding-bottom: 80px;
             user-select: none;
+            opacity: 0; /* PER FADE-IN INIZIALE */
+            transition: opacity 0.5s ease;
         }
+        
+        body.loaded { opacity: 1; }
 
         /* HEADER */
         .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; margin-top: 10px; }
@@ -78,31 +82,13 @@
         /* UNIFORM ACTION BUTTONS */
         .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
         
-        .action-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-sizing: border-box;
-            border: none;
-            transition: transform 0.1s;
-            text-decoration: none; /* Per i link */
-        }
+        .action-btn { width: 100%; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; border: none; transition: transform 0.1s; text-decoration: none; }
         .action-btn:active { transform: scale(0.98); }
 
-        /* Button Colors */
         .btn-red { background: rgba(255, 82, 82, 0.15); border: 1px solid var(--danger); color: #ff8a80; }
         .btn-red.active { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(255, 82, 82, 0.4); }
-        
         .btn-blue { background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); color: var(--telegram); }
         .btn-blue:hover { background: var(--telegram); color: #fff; }
-
         .btn-gold { background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .btn-gold:hover { background: var(--accent); color: #000; }
 
@@ -129,10 +115,8 @@
         input:checked + .slider:before { transform: translateX(16px); }
 
         .chart-wrapper { position: relative; height: 220px; width: 100%; margin-top:20px; }
-        .cta-btn { background: linear-gradient(90deg, var(--accent), #f0e68c); color: #000; width: 90%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); text-decoration: none; display: block; text-align: center; text-transform: uppercase; margin: 25px auto 10px auto; }
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
-        .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; font-family: monospace; }
         .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; }
         
         .info-icon { background: rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 14px; height: 14px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; margin-left: 5px; }
@@ -338,7 +322,7 @@
     <hr>
     <a href="https://t.me/selectaitalia" class="cta-btn">💎 Canale @selectaitalia</a>
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.1 Stable</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.2 Polish</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -350,6 +334,9 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        
+        // FADE IN ON LOAD
+        window.addEventListener('load', () => { document.body.classList.add('loaded'); });
 
         let pacChart = null; let renChart = null;
         let pacMode = 'line'; let renMode = 'line';
@@ -511,11 +498,22 @@
             let instance = (id === 'pacChart') ? pacChart : renChart;
             if(instance) instance.destroy();
 
+            // GRADIENT LOGIC
+            let bg1 = colors[0];
+            if(mode === 'line') {
+                let gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                gradient.addColorStop(0, colors[0] + '66'); // 40% opacity
+                gradient.addColorStop(1, colors[0] + '00'); // 0% opacity
+                bg1 = gradient;
+            }
+
             let config;
             if(mode === 'line') {
-                config = { type: 'line', data: { labels: labels, datasets: [ { data: data1, borderColor: colors[0], backgroundColor: colors[0]+'33', fill: true, tension: 0.3, pointRadius: 0 }, ...(data2 ? [{ data: data2, borderColor: '#fff', borderDash:[5,5], pointRadius:0, borderWidth:1 }] : []) ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x:{display:false}, y:{display:false} }, interaction: { intersect: false, mode: 'index' } } };
+                config = { type: 'line', data: { labels: labels, datasets: [ { data: data1, borderColor: colors[0], backgroundColor: bg1, fill: true, tension: 0.3, pointRadius: 0 }, ...(data2 ? [{ data: data2, borderColor: '#fff', borderDash:[5,5], pointRadius:0, borderWidth:1 }] : []) ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x:{display:false}, y:{display:false} }, interaction: { intersect: false, mode: 'index' } } };
             } else {
-                config = { type: 'doughnut', data: { labels: labels, datasets: [{ data: data1, backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
+                let val1 = data2 ? data2[data2.length-1] : data1[0]; 
+                let val2 = data1[data1.length-1] - val1;
+                config = { type: 'doughnut', data: { labels: ['Base', 'Gain'], datasets: [{ data: [val1, val2], backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
             }
             let newChart = new Chart(ctx, config);
             if(id === 'pacChart') pacChart = newChart; else renChart = newChart;
@@ -543,7 +541,6 @@
             inputs.forEach(el => { if(el.id) { if(el.type === 'checkbox') data[el.id] = el.checked; else data[el.id] = el.value; } });
             localStorage.setItem('selectaData_v4', JSON.stringify(data));
         }
-        // Save on change
         document.addEventListener('change', saveData);
         
         loadData();

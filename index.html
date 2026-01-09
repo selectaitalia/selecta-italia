@@ -26,6 +26,8 @@
             --text-sec: #8aaec4;
             --success: #00e676; 
             --danger: #ff5252;
+            --warning: #ffab00;
+            --telegram: #229ED9;
         }
 
         body {
@@ -53,66 +55,28 @@
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
 
-        /* --- NUOVO SISTEMA STEPPER (PULSANTI) --- */
-        .stepper-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 5px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+        .chart-controls { display: flex; gap: 5px; }
+        .chart-btn { background: rgba(255,255,255,0.1); border: none; color: var(--text-sec); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
+        .chart-btn.active { background: var(--accent); color: #000; }
 
-        .step-btn {
-            background: linear-gradient(145deg, #222, #111);
-            border: 1px solid var(--accent-dim);
-            color: var(--accent);
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.1s;
-            user-select: none;
-        }
+        /* STEPPER */
+        .stepper-container { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 5px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .step-btn { background: linear-gradient(145deg, #222, #111); border: 1px solid var(--accent-dim); color: var(--accent); width: 45px; height: 45px; border-radius: 10px; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.1s; user-select: none; }
         .step-btn:active { transform: scale(0.9); background: var(--accent); color: #000; }
+        .step-display { flex: 1; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; }
+        .step-display input { background: transparent; border: none; color: #fff; text-align: center; font-size: 18px; font-weight: 700; width: 100%; outline: none; }
+        .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
 
-        .step-display {
-            flex: 1;
-            text-align: center;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .step-display input {
-            background: transparent;
-            border: none;
-            color: #fff;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 700;
-            width: 100%;
-            outline: none;
-        }
-        .step-label {
-            font-size: 10px;
-            color: var(--text-sec);
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
+        /* TOOLTIP ICON */
+        .info-icon { background: rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 14px; height: 14px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
 
-        /* ALTRI ELEMENTI */
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 15px; padding: 25px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-title { color: var(--accent); font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .modal-text { color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+        .modal-btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -122,7 +86,8 @@
         input:checked + .slider:before { transform: translateX(16px); }
 
         .results-box { background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .res-value-main { font-size: 26px; font-weight: 800; color: #fff; margin: 5px 0; }
+        .res-value-main { font-size: 26px; font-weight: 800; color: #fff; margin: 5px 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .gamification-icon { font-size: 22px; }
         .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; text-align: left; }
         .res-item-small { font-size: 11px; color: var(--text-sec); }
         .res-val-small { font-size: 14px; font-weight: 700; color: #fff; }
@@ -130,13 +95,21 @@
         .text-red { color: var(--danger); }
         .text-gold { color: var(--accent); }
 
+        /* SHARE BUTTON */
+        .share-btn {
+            background: rgba(34, 158, 217, 0.2); border: 1px solid var(--telegram); color: var(--telegram);
+            padding: 8px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            margin-top: 15px; cursor: pointer; transition: all 0.2s; width: 80%;
+        }
+        .share-btn:hover { background: var(--telegram); color: #fff; }
+
         .partner-section { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .partner-btn-gold { background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); padding: 12px 15px; border-radius: 10px; text-decoration: none; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; margin-bottom: 8px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
         .partner-btn-gold:hover { background: var(--accent); color: #000; }
         
         .chart-wrapper { position: relative; height: 220px; width: 100%; margin-top:20px; }
         
-        /* FOOTER */
         .cta-btn { background: linear-gradient(90deg, var(--accent), #f0e68c); color: #000; width: 90%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); text-decoration: none; display: block; text-align: center; text-transform: uppercase; margin: 25px auto 10px auto; }
         .cta-btn:active { transform: scale(0.98); }
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
@@ -144,8 +117,6 @@
         .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; font-family: monospace; }
         
         .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; }
-
-        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -163,47 +134,44 @@
     <div id="pac" class="tab-content active">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">📈 PAC & Decumulo</div>
+                <div class="card-title">📈 PAC</div>
+                <div class="chart-controls">
+                    <button class="chart-btn active" onclick="setChartMode('pac', 'line')">Linea</button>
+                    <button class="chart-btn" onclick="setChartMode('pac', 'pie')">Torta</button>
+                </div>
             </div>
             
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-initial', -500)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Capitale Iniziale (€)</span>
-                    <input type="number" id="pac-initial" value="5000" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Capitale Iniziale (€)</span><input type="number" id="pac-initial" value="5000" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('pac-initial', 500)">+</div>
             </div>
 
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-monthly', -50)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Versamento Mensile (€)</span>
-                    <input type="number" id="pac-monthly" value="400" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('pac-monthly', 50)">+</div>
             </div>
 
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-years', -1)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Durata (Anni)</span>
-                    <input type="number" id="pac-years" value="15" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Durata (Anni)</span><input type="number" id="pac-years" value="15" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('pac-years', 1)">+</div>
             </div>
 
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-rate', -0.5)">-</div>
                 <div class="step-display">
-                    <span class="step-label">Rendimento Medio (%)</span>
+                    <span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span>
                     <input type="number" id="pac-rate" value="8" step="0.5" onchange="calculateAll()">
                 </div>
                 <div class="step-btn" onclick="changeVal('pac-rate', 0.5)">+</div>
             </div>
             
              <div class="switch-container">
-                <div style="font-size:12px; color:#aaa;">Calcola Inflazione (Reale)</div>
+                <div style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:5px;">
+                    Calcola Inflazione (Reale) <span class="info-icon" onclick="showInfo('inflation')">i</span>
+                </div>
                 <label class="switch"><input type="checkbox" id="pac-inflation" onchange="calculateAll()"><span class="slider"></span></label>
             </div>
             
@@ -214,12 +182,16 @@
 
             <div class="results-box">
                 <div style="font-size:11px; color:var(--text-sec); text-transform:uppercase;">Montante Finale Lordo</div>
-                <div class="res-value-main" id="res-pac-gross">€ 0</div>
-                
+                <div class="res-value-main">
+                    <span id="res-pac-gross">€ 0</span>
+                    <span id="pac-game-icon" class="gamification-icon"></span>
+                </div>
                 <div class="res-grid" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
                     <div><div class="res-item-small">Versato</div><div class="res-val-small" id="res-pac-invested">€ 0</div></div>
                     <div><div class="res-item-small">Guadagno</div><div class="res-val-small text-green" id="res-pac-gain">€ 0</div></div>
                 </div>
+                
+                <div class="share-btn" onclick="shareTelegram('pac')">✈️ Condividi su Telegram</div>
 
                 <div class="partner-section">
                     <div style="font-size:11px; color:var(--text-sec); margin-bottom:10px;">⚡ Inizia ora il tuo PAC:</div>
@@ -232,22 +204,19 @@
 
             <div class="card" style="margin-top:20px; background: linear-gradient(135deg, rgba(212,175,55,0.05), rgba(0,0,0,0));">
                  <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="color:var(--accent); font-weight:bold; font-size:13px;">🔄 Ritiro Mensile</span>
+                    <span style="color:var(--accent); font-weight:bold; font-size:13px; display:flex; align-items:center; gap:5px;">
+                        🔄 Ritiro Mensile <span class="info-icon" onclick="showInfo('tax')">i</span>
+                    </span>
                     <select id="pac-tax-rate" class="tax-select" onchange="calculateAll()">
                         <option value="26">26% ETF</option>
                         <option value="12.5">12.5% Bond</option>
                     </select>
                 </div>
-                
                 <div class="stepper-container">
                     <div class="step-btn" onclick="changeVal('pac-withdraw-gross', -50)">-</div>
-                    <div class="step-display">
-                        <span class="step-label">Prelievo Lordo (€)</span>
-                        <input type="number" id="pac-withdraw-gross" value="0" onchange="calculateAll()">
-                    </div>
+                    <div class="step-display"><span class="step-label">Prelievo Lordo (€)</span><input type="number" id="pac-withdraw-gross" value="0" onchange="calculateAll()"></div>
                     <div class="step-btn" onclick="changeVal('pac-withdraw-gross', 50)">+</div>
                 </div>
-
                 <div class="res-grid">
                     <div><div class="res-item-small">Netto in Tasca</div><div class="res-val-small text-green" id="res-pac-net-monthly">€ 0</div></div>
                     <div><div class="res-item-small">Durata</div><div class="res-val-small" style="font-size:11px;" id="res-pac-duration">---</div></div>
@@ -262,50 +231,41 @@
 
     <div id="rendita" class="tab-content">
         <div class="card">
-            <div class="card-header"><div class="card-title">🏠 Rendita Asset</div></div>
+            <div class="card-header">
+                <div class="card-title">🏠 Rendita</div>
+                <div class="chart-controls">
+                    <button class="chart-btn active" onclick="setChartMode('ren', 'line')">Linea</button>
+                    <button class="chart-btn" onclick="setChartMode('ren', 'pie')">Torta</button>
+                </div>
+            </div>
 
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-asset-val', -5000)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Valore Asset Totale (€)</span>
-                    <input type="number" id="ren-asset-val" value="200000" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Valore Asset Totale (€)</span><input type="number" id="ren-asset-val" value="200000" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-asset-val', 5000)">+</div>
             </div>
             
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-invested', -5000)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Tuo Capitale Versato (€)</span>
-                    <input type="number" id="ren-invested" value="50000" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Tuo Capitale Versato (€)</span><input type="number" id="ren-invested" value="50000" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-invested', 5000)">+</div>
             </div>
 
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-monthly', -50)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Rendita Mensile Lorda (€)</span>
-                    <input type="number" id="ren-monthly" value="800" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Rendita Mensile Lorda (€)</span><input type="number" id="ren-monthly" value="800" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-monthly', 50)">+</div>
             </div>
 
              <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-growth', -0.5)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Rivalutazione Annua (%)</span>
-                    <input type="number" id="ren-growth" value="1.5" step="0.5" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Rivalutazione Annua (%)</span><input type="number" id="ren-growth" value="1.5" step="0.5" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-growth', 0.5)">+</div>
             </div>
 
             <div class="stepper-container" style="margin-top:10px;">
                 <div class="step-btn" onclick="changeVal('ren-years', -1)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Proiezione Anni</span>
-                    <input type="number" id="ren-years" value="15" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Proiezione Anni</span><input type="number" id="ren-years" value="15" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-years', 1)">+</div>
             </div>
 
@@ -325,7 +285,10 @@
 
             <div class="results-box">
                 <div style="font-size:11px; color:var(--text-sec);">Ricchezza Totale (Asset + Cash)</div>
-                <div class="res-value-main" id="res-ren-total-val">€ 0</div>
+                <div class="res-value-main">
+                    <span id="res-ren-total-val">€ 0</span>
+                    <span id="ren-game-icon" class="gamification-icon"></span>
+                </div>
 
                 <div class="res-grid">
                     <div><div class="res-item-small">Valore Asset</div><div class="res-val-small" id="res-ren-final-asset">€ 0</div></div>
@@ -336,6 +299,8 @@
                     <div><div class="res-item-small">ROI</div><div class="res-val-small text-gold" id="res-ren-roi">0%</div></div>
                     <div><div class="res-item-small">Netto/Mese</div><div class="res-val-small" id="res-ren-monthly-net">€ 0</div></div>
                 </div>
+
+                <div class="share-btn" onclick="shareTelegram('ren')">✈️ Condividi su Telegram</div>
 
                  <div class="partner-section">
                     <div style="font-size:11px; color:var(--text-sec); margin-bottom:10px;">⚡ Ottieni il 3.75% sulla liquidità:</div>
@@ -380,10 +345,18 @@
 
     <div class="disclaimer">
         <strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.
-        <br><br>© Selecta Italia - v2.0 Stable (Button Edition)
+        <br><br>© Selecta Italia - v1.0 Stable Release
     </div>
     
     <div style="height: 20px;"></div>
+
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modalTitle" class="modal-title">Info</div>
+            <div id="modalText" class="modal-text">Dettaglio info...</div>
+            <button class="modal-btn" onclick="closeInfo()">Chiudi</button>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -391,25 +364,72 @@
 
         let pacChart = null;
         let renChart = null;
+        let pacMode = 'line';
+        let renMode = 'line';
         const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-        // --- FUNZIONE PER I PULSANTI STEPPER ---
+        // --- INFO MODAL LOGIC ---
+        const infoData = {
+            'rate': { title: "Rendimento Atteso", text: "Il mercato azionario globale (MSCI World / S&P 500) ha storicamente reso circa il 7-9% annuo. Usa 4% per profili prudenti, 8% per aggressivi." },
+            'inflation': { title: "Inflazione Reale", text: "L'inflazione (stimata al 2% annuo) riduce il potere d'acquisto. Attivando questa opzione, vedrai quanto varranno i tuoi soldi 'domani' con i prezzi di oggi." },
+            'tax': { title: "Tassazione", text: "In Italia, le plusvalenze da ETF/Azioni sono tassate al 26%. I Titoli di Stato (BTP/Bond governativi) godono di aliquota agevolata al 12.5%." }
+        };
+
+        function showInfo(key) {
+            const data = infoData[key];
+            if(data) {
+                document.getElementById('modalTitle').innerText = data.title;
+                document.getElementById('modalText').innerText = data.text;
+                document.getElementById('infoModal').style.display = 'flex';
+            }
+        }
+        function closeInfo() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        // --- GAMIFICATION LOGIC ---
+        function getGameIcon(amount) {
+            if(amount < 10000) return "🛴"; // Monopattino
+            if(amount < 30000) return "🛵"; // Scooter
+            if(amount < 100000) return "🚗"; // Auto
+            if(amount < 250000) return "🏎️"; // Supercar
+            if(amount < 500000) return "🏠"; // Casa
+            return "🛥️"; // Yacht / Libertà
+        }
+
+        // --- SHARE LOGIC ---
+        function shareTelegram(type) {
+            let text = "";
+            if(type === 'pac') {
+                let monthly = document.getElementById('pac-monthly').value;
+                let years = document.getElementById('pac-years').value;
+                let total = document.getElementById('res-pac-gross').innerText;
+                text = `📊 Ho appena simulato il mio Piano di Accumulo: investendo ${monthly}€ al mese per ${years} anni potrei ottenere ${total}! 🤯\n\nCalcola anche tu il tuo qui: https://t.me/SelectaHelpBot`;
+            } else {
+                let total = document.getElementById('res-ren-total-val').innerText;
+                text = `🏠 Ho simulato la mia rendita immobiliare/asset: potrei generare una ricchezza totale di ${total}! 💰\n\nFai il calcolo qui: https://t.me/SelectaHelpBot`;
+            }
+            // Apre il link di condivisione Telegram
+            const url = `https://t.me/share/url?url=${encodeURIComponent(text)}`;
+            tg.openTelegramLink(url);
+        }
+
         function changeVal(id, amount) {
             const input = document.getElementById(id);
             let val = parseFloat(input.value) || 0;
-            let step = parseFloat(input.step) || (amount % 1 !== 0 ? 0.5 : 1); 
-            
-            // Aggiorna valore
             let newVal = val + amount;
-            
-            // Evita numeri negativi se non voluti
             if(newVal < 0) newVal = 0;
-            
-            // Fix decimali brutti (es. 1.500000002)
             if(amount % 1 !== 0) newVal = parseFloat(newVal.toFixed(1));
-
             input.value = newVal;
             calculateAll();
+        }
+
+        function setChartMode(chart, mode) {
+            if(chart === 'pac') { pacMode = mode; calculatePAC(); }
+            if(chart === 'ren') { renMode = mode; calculateRen(); }
+            let parent = event.target.parentElement;
+            parent.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
         }
 
         function saveData() {
@@ -421,11 +441,11 @@
                     else data[el.id] = el.value;
                 }
             });
-            localStorage.setItem('selectaData_v2', JSON.stringify(data));
+            localStorage.setItem('selectaData_v3', JSON.stringify(data));
         }
 
         function loadData() {
-            const data = JSON.parse(localStorage.getItem('selectaData_v2'));
+            const data = JSON.parse(localStorage.getItem('selectaData_v3'));
             if(data) {
                 for (const [key, value] of Object.entries(data)) {
                     const el = document.getElementById(key);
@@ -439,7 +459,7 @@
 
         function clearData() {
             if(confirm('Vuoi resettare i dati?')) {
-                localStorage.removeItem('selectaData_v2');
+                localStorage.removeItem('selectaData_v3');
                 location.reload();
             }
         }
@@ -477,13 +497,15 @@
 
             let labels = [];
             let dataTot = [];
+            let dataInv = [];
 
             for(let i=1; i<=months; i++){
                 currentTotal = (currentTotal + PMT) * (1 + monthlyRate);
                 currentInvested += PMT;
-                if(i % 12 === 0) { // Salva solo ogni anno per il grafico (più leggero)
+                if(i % 12 === 0) {
                      labels.push(`A${i/12}`);
                      dataTot.push(currentTotal);
+                     dataInv.push(currentInvested);
                 }
             }
 
@@ -511,8 +533,15 @@
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
             document.getElementById('res-pac-net-monthly').innerText = fmt.format(netWithdrawal);
             document.getElementById('res-pac-duration').innerText = sustainabilityText;
+            
+            // UPDATE ICON
+            document.getElementById('pac-game-icon').innerText = getGameIcon(grossFinal);
 
-            updateChart('pacChart', labels, dataTot, '#00e676');
+            if (pacMode === 'pie') {
+                updateChart('pacChart', 'pie', ['Versato', 'Guadagno'], [currentInvested, gainTotal], ['#004d40', '#00e676']);
+            } else {
+                updateChart('pacChart', 'line', labels, dataTot, '#00e676');
+            }
             updateComparison();
         }
 
@@ -528,7 +557,6 @@
             let rentNet = Rent * (1 - tax);
             let currentAsset = Asset;
             let cash = 0;
-            
             let labels = [];
             let dataWealth = [];
 
@@ -549,8 +577,15 @@
             document.getElementById('res-ren-total-cash').innerText = fmt.format(cash);
             document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
             document.getElementById('res-ren-monthly-net').innerText = fmt.format(rentNet);
+            
+            // UPDATE ICON
+            document.getElementById('ren-game-icon').innerText = getGameIcon(totalWealth);
 
-            updateChart('renChart', labels, dataWealth, '#d4af37');
+            if (renMode === 'pie') {
+                updateChart('renChart', 'pie', ['Valore Asset', 'Cash Generato'], [currentAsset, cash], ['#8a701e', '#d4af37']);
+            } else {
+                updateChart('renChart', 'line', labels, dataWealth, '#d4af37');
+            }
             updateComparison();
         }
 
@@ -568,32 +603,26 @@
 
         function parseLocaleNum(str) { return parseFloat(str.replace(/[^0-9,-]+/g,"").replace(',','.').replace('€','').trim()); }
 
-        function updateChart(id, labels, data, color) {
+        function updateChart(id, type, labels, data, colors) {
             const ctx = document.getElementById(id).getContext('2d');
             let instance = (id === 'pacChart') ? pacChart : renChart;
             if(instance) instance.destroy();
 
-            let newChart = new Chart(ctx, {
-                type: 'line',
-                data: { 
-                    labels: labels, 
-                    datasets: [{ 
-                        data: data, 
-                        borderColor: color, 
-                        backgroundColor: color + '22', 
-                        fill: true, 
-                        tension: 0.3,
-                        pointRadius: 0 
-                    }] 
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { display: false }, y: { display: false } },
-                    interaction: { intersect: false, mode: 'index' },
-                }
-            });
-
+            let config = {};
+            if (type === 'line') {
+                config = {
+                    type: 'line',
+                    data: { labels: labels, datasets: [{ data: data, borderColor: colors, backgroundColor: colors + '22', fill: true, tension: 0.3, pointRadius: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, interaction: { intersect: false, mode: 'index' } }
+                };
+            } else {
+                config = {
+                    type: 'doughnut',
+                    data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#ccc', boxWidth: 10, font: {size: 10} } } } }
+                };
+            }
+            let newChart = new Chart(ctx, config);
             if(id === 'pacChart') pacChart = newChart;
             else renChart = newChart;
         }

@@ -68,17 +68,17 @@
         .chart-btn { background: rgba(255,255,255,0.1); border: none; color: var(--text-sec); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .chart-btn.active { background: var(--accent); color: #000; }
 
-        /* STEPPER */
+        /* STEPPER & INPUTS */
         .stepper-container { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 5px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .step-btn { background: linear-gradient(145deg, #222, #111); border: 1px solid var(--accent-dim); color: var(--accent); width: 45px; height: 45px; border-radius: 10px; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.1s; }
         .step-btn:active { transform: scale(0.9); background: var(--accent); color: #000; }
         
         .step-display { flex: 1; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; position: relative; }
         
-        /* INPUT MODIFICATI PER SCRITTURA */
+        /* INPUT MODIFICATI PER SCRITTURA DIRETTA */
         .step-display input { 
             background: transparent; 
-            border: 1px solid transparent; /* Bordo invisibile di base */
+            border: 1px solid transparent; 
             color: #fff; 
             text-align: center; 
             font-size: 18px; 
@@ -90,26 +90,18 @@
             transition: background 0.2s, border 0.2s;
             padding: 2px;
         }
-        
-        /* Effetto quando clicchi per scrivere */
         .step-display input:focus {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.3);
         }
-
-        /* Rimuove le freccette standard del browser dagli input numerici */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
         .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; pointer-events: none; }
 
         /* DNA BADGE */
         .dna-badge { background: rgba(212, 175, 55, 0.2); border: 1px solid var(--accent); color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
 
-        /* UNIFORM ACTION BUTTONS */
+        /* ACTION BUTTONS */
         .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
         .action-btn { width: 100%; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; border: none; transition: transform 0.1s; text-decoration: none; }
         .action-btn:active { transform: scale(0.98); }
@@ -265,6 +257,11 @@
                 <div class="step-display"><span class="step-label">Anni Proiezione</span><input type="number" id="ren-years" value="15" onchange="calculateRen()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('ren-years', 1)">+</div>
             </div>
+
+            <div class="switch-container">
+                <div style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:5px;">Calcola Inflazione <span class="info-icon" onclick="showInfo('inflation')">i</span></div>
+                <label class="switch"><input type="checkbox" id="ren-inflation" onchange="calculateRen()"><span class="slider"></span></label>
+            </div>
             
             <div class="results-box">
                 <div style="font-size:11px; color:var(--text-sec);">RICCHEZZA TOTALE GENERATA</div>
@@ -355,7 +352,7 @@
     </a>
     
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.3 Polish</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.4 Polish</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -465,9 +462,20 @@
             let Invested = parseFloat(document.getElementById('ren-invested').value)||0;
             let Rent = parseFloat(document.getElementById('ren-monthly').value)||0;
             let years = parseFloat(document.getElementById('ren-years').value)||1;
+            let useInflation = document.getElementById('ren-inflation').checked;
             
             let cash = Rent * 12 * years; 
             let total = Asset + cash; 
+
+            // LOGICA INFLAZIONE RENDITA
+            // Se attiva, sconta il valore finale totale al tasso del 2% annuo composto
+            if(useInflation) {
+                total = total / Math.pow(1.02, years);
+                // Scaliamo proporzionalmente anche le parti per visualizzazione
+                let factor = 1 / Math.pow(1.02, years);
+                Asset = Asset * factor;
+                cash = cash * factor;
+            }
             
             let roi = 0;
             if (Invested > 0) roi = ((total - Invested) / Invested) * 100;

@@ -3,57 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selecta Italia</title>
 <style>
-    /* Stile generale per il corpo per centrare il contenuto */
+    /* Reset di base */
+    * {
+        box-sizing: border-box;
+    }
+
     body {
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 100vh;
+        min-height: 100vh; /* Occupa tutta l'altezza dello schermo */
         margin: 0;
-        background-color: #f4f4f9;
-        position: relative; /* Necessario per il footer assoluto */
+        background-color: #f0f2f5; /* Colore di sfondo della pagina (grigio chiaro) */
+        position: relative;
+        padding: 20px;
     }
 
-    /* --- CORREZIONE PULSANTE SELECTA --- */
+    /* IL CONTENITORE (La scheda bianca al centro) */
+    .card {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* Ombra morbida */
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        margin-bottom: 50px; /* Spazio per non coprire il v1.0 */
+    }
+
+    /* Titolo Principale */
+    h1 {
+        margin-top: 0;
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    /* Testo descrittivo */
+    p {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.5;
+    }
+
+    /* --- IL PULSANTE CORRETTO --- */
     .btn-selecta {
         display: inline-block;
-        background-color: #007bff; /* Blu pulsante professionale */
-        color: white;              /* Testo bianco */
-        padding: 15px 30px;        /* Grandezza del pulsante */
-        text-decoration: none;     /* RIMUOVE la sottolineatura blu brutta */
-        border-radius: 8px;        /* Bordi arrotondati */
+        background-color: #0088cc; /* Blu Telegram */
+        color: white;
+        padding: 15px 30px;
+        text-decoration: none; /* Fondamentale: toglie la riga blu */
+        border-radius: 50px;   /* Arrotondato a pillola */
         font-weight: bold;
         font-size: 16px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: background-color 0.3s;
-        border: none;
-        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+        width: 100%; /* Occupa tutta la larghezza della scheda */
     }
 
     .btn-selecta:hover {
-        background-color: #0056b3; /* Effetto al passaggio del mouse */
+        background-color: #006699;
+        transform: translateY(-2px); /* Leggero effetto sollevamento */
+        box-shadow: 0 6px 8px rgba(0,0,0,0.25);
     }
 
-    /* --- RIPRISTINO v1.0 --- */
+    /* --- v1.0 IN BASSO --- */
     .version-tag {
         position: absolute;
-        bottom: 15px;
+        bottom: 20px;
         width: 100%;
         text-align: center;
-        color: #888;
+        color: #a0a0a0;
         font-size: 12px;
         font-family: monospace;
+        letter-spacing: 1px;
     }
 </style>
 </head>
 <body>
 
-    <a href="https://t.me/tuo_canale_selecta" class="btn-selecta">
-        Vai al Canale Selecta
-    </a>
+    <div class="card">
+        <h1>Selecta Italia</h1>
+        
+        <p>Benvenuto nel portale ufficiale. Clicca qui sotto per accedere direttamente al nostro canale Telegram.</p>
+
+        <a href="https://t.me/SelectaItalia" class="btn-selecta" target="_blank">
+            Entra nel Canale
+        </a>
+    </div>
 
     <div class="version-tag">v1.0</div>
 

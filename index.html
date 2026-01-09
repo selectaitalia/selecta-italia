@@ -22,7 +22,7 @@
         :root {
             --bg-dark: #000810;
             --bg-card: #001f33;
-            --accent: #d4af37; /* Oro Selecta */
+            --accent: #d4af37; 
             --accent-dim: #8a701e;
             --text-main: #ffffff;
             --text-sec: #8aaec4;
@@ -31,41 +31,26 @@
             --warning: #ffab00;
         }
 
-        /* STRUTTURA GENERALE */
         html { 
             background: linear-gradient(180deg, #001220 0%, #000000 100%); 
             min-height: 100vh; 
-            overscroll-behavior: none; /* Impedisce il rimbalzo su iOS */
-            touch-action: pan-y; /* Permette lo scroll verticale ma blocca zoom e orizzontale */
+            overscroll-behavior: none; 
+            touch-action: pan-y; 
         }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0 auto; 
             padding: 15px; 
             color: var(--text-main);
-            max-width: 500px; /* Ottimizzato per PC */
+            max-width: 500px; 
             min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 50px; /* Spazio extra in fondo per scroll */
+            padding-bottom: 50px; 
         }
 
-        /* HEADER & LOGO */
-        .header { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            margin-bottom: 20px; 
-            margin-top: 10px; 
-        }
-        .logo-img { 
-            width: 100%; 
-            max-width: 180px; 
-            height: auto; 
-            display: block;
-            filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); 
-        }
+        .header { display: flex; justify-content: center; margin-bottom: 20px; margin-top: 10px; }
+        .logo-img { width: 100%; max-width: 180px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); }
 
-        /* TAB DI NAVIGAZIONE */
         .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
         .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-sec); font-weight: 600; font-size: 13px; cursor: pointer; border-radius: 8px; transition: all 0.3s; }
         .tab-btn.active { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(212,175,55,0.4); }
@@ -74,12 +59,10 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* CARDS (CONTENITORI) */
         .card { background-color: var(--bg-card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin-bottom: 25px; border: 1px solid rgba(212, 175, 55, 0.15); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
 
-        /* INPUTS E SLIDER */
         .input-group { margin-bottom: 20px; }
         .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         label { font-size: 13px; color: var(--text-sec); }
@@ -87,47 +70,24 @@
         .value-display { font-family: 'Roboto Mono', monospace; font-weight: 700; color: #fff; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px; font-size: 14px; min-width: 80px; text-align: right; border: 1px solid rgba(255,255,255,0.1); }
         .value-display input { background: transparent; border: none; color: inherit; width: 70px; text-align: right; outline: none; padding: 0; margin: 0; }
         
-        .tax-select {
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff;
-            border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; cursor: pointer;
-        }
+        .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; cursor: pointer; }
 
-        /* --- SLIDER FIX PER MOBILE (FORCE TOUCH) --- */
+        /* --- SLIDER FIX PER MOBILE (CSS PURO) --- */
         input[type=range] { 
             -webkit-appearance: none; 
             width: 100%; 
             background: transparent;
-            height: 40px; /* Area di tocco aumentata */
+            height: 40px; 
             cursor: pointer;
             margin: 0;
             padding: 0;
-            display: block;
-            /* Forza il browser a ignorare lo scroll quando si tocca qui */
-            touch-action: none !important; 
+            touch-action: none; /* Questa è la chiave per il touch */
         }
         input[type=range]:focus { outline: none; }
         
-        input[type=range]::-webkit-slider-runnable-track { 
-            width: 100%; 
-            height: 6px; 
-            cursor: pointer; 
-            background: rgba(255,255,255,0.1); 
-            border-radius: 3px; 
-            border: none;
-        }
-        
-        input[type=range]::-webkit-slider-thumb { 
-            height: 24px; 
-            width: 24px; 
-            border-radius: 50%; 
-            background: var(--accent); 
-            box-shadow: 0 0 10px rgba(212,175,55,0.5); 
-            margin-top: -9px; /* Centratura precisa */
-            border: 2px solid #000; 
-            -webkit-appearance: none;
-        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 3px; border: none; }
+        input[type=range]::-webkit-slider-thumb { height: 24px; width: 24px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px rgba(212,175,55,0.5); margin-top: -9px; border: 2px solid #000; -webkit-appearance: none; }
 
-        /* SWITCH INFLAZIONE */
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -136,7 +96,6 @@
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(16px); }
 
-        /* BOX RISULTATI */
         .results-box { background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
         .res-label { font-size: 11px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; }
         .res-value-main { font-size: 26px; font-weight: 800; color: #fff; margin: 5px 0; }
@@ -147,90 +106,33 @@
         .text-red { color: var(--danger); }
         .text-gold { color: var(--accent); }
 
-        /* BOX DECUMULO */
         .decumulo-box { background: linear-gradient(135deg, rgba(212,175,55,0.05), rgba(0,0,0,0)); border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; padding: 15px; margin-top: 20px; }
         .decumulo-header { font-size: 13px; font-weight: bold; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap:5px; }
 
-        /* CHART WRAPPER */
         .chart-controls { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 10px; }
         .chart-btn { background: rgba(255,255,255,0.1); border: none; color: var(--text-sec); padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 11px; }
         .chart-btn.active { background: var(--accent); color: #000; }
         .chart-wrapper { position: relative; height: 220px; width: 100%; }
 
-        /* BOX CONFRONTO */
         .comp-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid #fff; }
         .comp-header { font-size: 12px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 5px; }
         .comp-val { font-size: 20px; font-weight: 700; color: #fff; }
 
-        /* BOX REFERRAL PARTNER */
-        .partner-section {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
-        }
-        .partner-label {
-            font-size: 11px;
-            color: var(--text-sec);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .partner-btn-gold {
-            background: linear-gradient(45deg, #111, #222);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 12px 15px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-            margin-bottom: 8px;
-            width: 100%;
-            box-sizing: border-box;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            cursor: pointer; /* Importante per tracking */
-        }
-        .partner-btn-gold:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 15px rgba(212,175,55,0.4);
-            transform: translateY(-2px);
-        }
+        .partner-section { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .partner-label { font-size: 11px; color: var(--text-sec); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .partner-btn-gold { background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); padding: 12px 15px; border-radius: 10px; text-decoration: none; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; margin-bottom: 8px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
+        .partner-btn-gold:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(212,175,55,0.4); transform: translateY(-2px); }
         .partner-btn-gold strong { font-weight: 800; }
 
-        /* FOOTER & CTA */
-        .cta-btn { 
-            background: linear-gradient(90deg, var(--accent), #f0e68c); 
-            color: #000; 
-            width: 90%; 
-            max-width: 350px;
-            padding: 14px; 
-            border-radius: 12px; 
-            border: none; 
-            font-size: 14px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); 
-            text-decoration: none; 
-            display: block; 
-            text-align: center; 
-            text-transform: uppercase; 
-            margin: 25px auto 10px auto; 
-            transition: transform 0.1s; 
-        }
+        .cta-btn { background: linear-gradient(90deg, var(--accent), #f0e68c); color: #000; width: 90%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); text-decoration: none; display: block; text-align: center; text-transform: uppercase; margin: 25px auto 10px auto; transition: transform 0.1s; }
         .cta-btn:active { transform: scale(0.98); }
         
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
-
         hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0; }
-        
-        /* DISCLAIMER STYLE */
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
+        
+        /* VERSIONE 1.0 */
+        .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -344,13 +246,11 @@
             <div class="input-group">
                 <div class="label-row"><label>Valore Totale Asset</label><div class="value-display">€ <input type="number" id="ren-asset-val" value="200000" oninput="sync('ren','asset-val')"></div></div>
                 <input type="range" id="rng-ren-asset-val" min="10000" max="1000000" step="5000" value="200000" oninput="sync('ren','asset-val')">
-                <div style="font-size:10px; color:#aaa; margin-top:2px;">Es. Valore immobile o portafoglio azioni</div>
             </div>
             
             <div class="input-group">
                 <div class="label-row"><label>Capitale Tuo Investito</label><div class="value-display">€ <input type="number" id="ren-invested" value="50000" oninput="sync('ren','invested')"></div></div>
                 <input type="range" id="rng-ren-invested" min="0" max="500000" step="5000" value="50000" oninput="sync('ren','invested')">
-                <div style="font-size:10px; color:#aaa; margin-top:2px;">Es. Soldi sborsati realmente di tasca tua</div>
             </div>
 
             <div class="input-group">
@@ -362,7 +262,6 @@
             <div class="input-group">
                 <div class="label-row"><label>Rendita Mensile LORDA</label><div class="value-display">€ <input type="number" id="ren-monthly" value="800" oninput="sync('ren','monthly')"></div></div>
                 <input type="range" id="rng-ren-monthly" min="100" max="5000" step="50" value="800" oninput="sync('ren','monthly')">
-                <div style="font-size:10px; color:#aaa; margin-top:2px;">Affitto o Dividendi (Totale Annuo / 12)</div>
             </div>
 
             <div class="input-group">
@@ -467,14 +366,12 @@
 
     <div class="disclaimer">
         <strong>DISCLAIMER:</strong> I calcoli sono puramente indicativi e basati su proiezioni matematiche costanti. Non costituiscono consulenza finanziaria né garanzia di rendimento futuro. 
-        I risultati "netti" sono stime basate sulla normativa fiscale italiana vigente (es. 26% su plusvalenze finanziarie standard, 21% cedolare secca), che potrebbe variare nel tempo. 
-        L'inflazione è calcolata come perdita di potere d'acquisto stimata (2%). 
-        Il calcolo del decumulo assume una tassazione pro-quota sul guadagno maturato.
-        L'utilizzo dei link partner contribuisce al supporto del progetto.
+        I risultati "netti" sono stime basate sulla normativa fiscale italiana vigente. 
         <br><br>
         © Selecta Italia - Tutti i diritti riservati.
     </div>
     
+    <div class="version-tag">v1.0 - Stable Release</div>
     <div style="height: 20px;"></div>
 
     <script>
@@ -487,7 +384,6 @@
         let renMode = 'line';
         const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-        // --- SISTEMA SALVATAGGIO DATI ---
         function saveData() {
             const inputs = document.querySelectorAll('input, select');
             let data = {};
@@ -525,7 +421,6 @@
             }
         }
 
-        // --- FUNZIONI CORE ---
         function openTab(id) {
             document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
@@ -547,7 +442,6 @@
             let inp = document.getElementById(`${group}-${id}`);
             if(document.activeElement === rng) inp.value = rng.value;
             else rng.value = inp.value;
-            
             calculateAll();
         }
 
@@ -557,7 +451,6 @@
             saveData(); 
         }
 
-        // --- CALCOLO PAC ---
         function calculatePAC() {
             let P = parseFloat(document.getElementById('pac-initial').value) || 0;
             let PMT = parseFloat(document.getElementById('pac-monthly').value) || 0;
@@ -626,7 +519,6 @@
             saveData();
         }
 
-        // --- CALCOLO RENDITA ---
         function calculateRen() {
             let AssetVal = parseFloat(document.getElementById('ren-asset-val').value) || 0;
             let Invested = parseFloat(document.getElementById('ren-invested').value) || 0;
@@ -684,10 +576,8 @@
             saveData();
         }
 
-        // --- CONFRONTO ---
         function updateComparison() {
             document.getElementById('comp-years').innerText = document.getElementById('pac-years').value;
-            
             let pacEnd = document.getElementById('res-pac-gross').innerText;
             let renEnd = document.getElementById('res-ren-total-val').innerText;
             let pacInv = document.getElementById('res-pac-invested').innerText;
@@ -700,14 +590,12 @@
 
             let vPac = parseLocaleNum(pacEnd);
             let vRen = parseLocaleNum(renEnd);
-            
             let winner = vPac > vRen ? "STRATEGIA PAC 🏆" : (vRen > vPac ? "STRATEGIA RENDITA 🏆" : "PAREGGIO");
             document.getElementById('comp-winner-text').innerText = winner;
         }
 
         function parseLocaleNum(str) { return parseFloat(str.replace(/[^0-9,-]+/g,"").replace(',','.')); }
 
-        // --- GESTIONE GRAFICI ---
         function updateChart(canvasId, mode, labels, data1, data2, colors) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             let instance = (canvasId === 'pacChart') ? pacChart : renChart;
@@ -768,14 +656,11 @@
             el.addEventListener('change', calculateAll);
         });
 
-        // --- FIX FINALE TOUCH MOBILE (FORCE EVENT) ---
-        // Forza lo slider a prendersi la priorità assoluta sul tocco
         const ranges = document.querySelectorAll('input[type="range"]');
         ranges.forEach(range => {
             range.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: false});
             range.addEventListener('touchmove', function(e) { e.stopPropagation(); }, {passive: false});
         });
-
     </script>
 </body>
 </html>

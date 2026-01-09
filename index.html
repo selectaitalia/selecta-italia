@@ -246,9 +246,19 @@
                 <div class="step-display"><span class="step-label">Capitale Versato (€)</span><input type="number" id="ren-invested" value="150000" onchange="calculateRen()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('ren-invested', 5000)">+</div>
             </div>
+
+            <div class="stepper-container">
+                <div class="step-btn" onclick="changeRenYield(-0.5)">-</div>
+                <div class="step-display">
+                    <span class="step-label">Rendimento Annuo (%)</span>
+                    <input type="number" id="ren-yield" value="4.8" onchange="updateRenFromYield()" inputmode="decimal">
+                </div>
+                <div class="step-btn" onclick="changeRenYield(0.5)">+</div>
+            </div>
+
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-monthly', -50)">-</div>
-                <div class="step-display"><span class="step-label">Rendita Mensile (€)</span><input type="number" id="ren-monthly" value="800" onchange="calculateRen()" inputmode="numeric"></div>
+                <div class="step-display"><span class="step-label">Entrata Mensile (€)</span><input type="number" id="ren-monthly" value="800" onchange="calculateRen()" inputmode="numeric"></div>
                 <div class="step-btn" onclick="changeVal('ren-monthly', 50)">+</div>
             </div>
              <div class="stepper-container">
@@ -262,7 +272,7 @@
                 <label class="switch"><input type="checkbox" id="ren-inflation" onchange="calculateRen()"><span class="slider"></span></label>
             </div>
             <div class="switch-container" style="border-top:none; margin-top:0;">
-                <div style="font-size:12px; color:#aaa;">Tasse (Cedolare 21%)</div>
+                <div style="font-size:12px; color:#aaa;">Tasse (21%)</div>
                 <label class="switch"><input type="checkbox" id="ren-tax" onchange="calculateRen()"><span class="slider"></span></label>
             </div>
             
@@ -355,7 +365,7 @@
     </a>
     
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.6 Polish</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.7 Polish</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -414,14 +424,13 @@
         function calculatePAC() {
             let P = parseFloat(document.getElementById('pac-initial').value) || 0;
             let PMT = parseFloat(document.getElementById('pac-monthly').value) || 0;
-            let withdrawal = parseFloat(document.getElementById('pac-withdrawal').value) || 0; // NEW
+            let withdrawal = parseFloat(document.getElementById('pac-withdrawal').value) || 0;
             let years = parseFloat(document.getElementById('pac-years').value) || 1;
             let rate = (parseFloat(document.getElementById('pac-rate').value) || 0) / 100;
             let costs = parseFloat(document.getElementById('pac-fees').value) || 0;
             let useInflation = document.getElementById('pac-inflation').checked;
             
-            // AGGIORNA LABEL NETTO
-            let netWith = withdrawal * 0.74; // 26% tax approx
+            let netWith = withdrawal * 0.74; 
             document.getElementById('pac-withdrawal-net').innerText = "Netto in tasca: " + fmt.format(netWith);
 
             let months = years * 12;
@@ -433,16 +442,11 @@
             let crashMonth = Math.floor(months / 2);
 
             for(let i=1; i<=months; i++){
-                // Interesse
                 currentTotal = currentTotal * (1 + monthlyRate);
-                
-                // Versamento
                 currentTotal += PMT;
                 currentInvested += PMT;
-                
-                // Prelievo (se c'è)
                 currentTotal -= withdrawal;
-                if(currentTotal < 0) currentTotal = 0; // Non può andare sotto zero
+                if(currentTotal < 0) currentTotal = 0;
 
                 if(crashMode && i === crashMonth) currentTotal = currentTotal * 0.65; 
                 if(i % 12 === 0) { labels.push(`A${i/12}`); dataTot.push(currentTotal); dataInv.push(currentInvested); }
@@ -456,7 +460,6 @@
             document.getElementById('res-pac-invested').innerText = fmt.format(currentInvested);
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
 
-            // DNA
             let dna = "🐢 Tartaruga Saggia";
             if(rate >= 0.08) dna = "🎯 Cecchino";
             if(rate >= 0.12 || crashMode) dna = "🐺 Lupo di Wall Street";
@@ -474,7 +477,32 @@
             updateComparison();
         }
 
-        function calculateRen() {
+        // --- NUOVE FUNZIONI LOGICA RENDITA (BIDIREZIONALE) ---
+
+        function changeRenYield(amount) {
+            triggerHaptic();
+            const input = document.getElementById('ren-yield');
+            let val = parseFloat(input.value) || 0;
+            let newVal = val + amount;
+            if(newVal < 0) newVal = 0;
+            input.value = newVal.toFixed(1);
+            updateRenFromYield();
+        }
+
+        function updateRenFromYield() {
+            // Se cambio la %, calcolo l'affitto
+            let Asset = parseFloat(document.getElementById('ren-asset-val').value)||0;
+            let Yield = parseFloat(document.getElementById('ren-yield').value)||0;
+            
+            // Formula: Affitto Mensile = (Asset * Yield%) / 12
+            let monthly = (Asset * (Yield / 100)) / 12;
+            document.getElementById('ren-monthly').value = monthly.toFixed(0);
+            
+            // Poi lancio il calcolo totale
+            calculateRen(true); 
+        }
+
+        function calculateRen(skipYieldUpdate = false) {
             let Asset = parseFloat(document.getElementById('ren-asset-val').value)||0;
             let Invested = parseFloat(document.getElementById('ren-invested').value)||0;
             let Rent = parseFloat(document.getElementById('ren-monthly').value)||0;
@@ -482,8 +510,14 @@
             let useInflation = document.getElementById('ren-inflation').checked;
             let useTax = document.getElementById('ren-tax').checked;
 
+            // Se l'utente cambia manualmente l'affitto, aggiorno la % Yield
+            if(!skipYieldUpdate && Asset > 0) {
+                 let yearlyRent = Rent * 12;
+                 let calcYield = (yearlyRent / Asset) * 100;
+                 document.getElementById('ren-yield').value = calcYield.toFixed(1);
+            }
+
             let cash = Rent * 12 * years;
-            
             if(useTax) cash = cash * 0.79; 
             
             let total = Asset + cash; 

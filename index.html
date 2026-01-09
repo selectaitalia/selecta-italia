@@ -7,13 +7,14 @@
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-42QMLWNCQ1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-42QMLWNCQ1', { 'debug_mode': true });
+      gtag('config', 'G-42QMLWNCQ1');
     </script>
 
     <style>
@@ -37,14 +38,15 @@
             color: var(--text-main);
             min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 50px; 
+            padding-bottom: 70px; /* Spazio extra per navbar */
         }
 
         .header { display: flex; justify-content: center; margin-bottom: 20px; margin-top: 10px; }
         .logo-img { width: 100%; max-width: 180px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); }
 
-        .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-sec); font-weight: 600; font-size: 13px; cursor: pointer; border-radius: 8px; transition: all 0.3s; }
+        /* TAB DI NAVIGAZIONE A 4 PULSANTI */
+        .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 10px 5px; border: none; background: transparent; color: var(--text-sec); font-weight: 600; font-size: 11px; cursor: pointer; border-radius: 8px; transition: all 0.3s; white-space: nowrap; }
         .tab-btn.active { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(212,175,55,0.4); }
         
         .tab-content { display: none; animation: fadeIn 0.4s ease; }
@@ -67,15 +69,7 @@
         .step-display input { background: transparent; border: none; color: #fff; text-align: center; font-size: 18px; font-weight: 700; width: 100%; outline: none; }
         .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
 
-        /* TOOLTIP ICON */
         .info-icon { background: rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 14px; height: 14px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
-
-        /* MODAL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 15px; padding: 25px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .modal-title { color: var(--accent); font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-        .modal-text { color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
-        .modal-btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
 
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
@@ -95,14 +89,10 @@
         .text-red { color: var(--danger); }
         .text-gold { color: var(--accent); }
 
-        /* SHARE BUTTON */
-        .share-btn {
-            background: rgba(34, 158, 217, 0.2); border: 1px solid var(--telegram); color: var(--telegram);
-            padding: 8px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold;
-            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-            margin-top: 15px; cursor: pointer; transition: all 0.2s; width: 80%;
-        }
+        .share-btn { background: rgba(34, 158, 217, 0.2); border: 1px solid var(--telegram); color: var(--telegram); padding: 8px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 15px; cursor: pointer; transition: all 0.2s; width: 80%; }
         .share-btn:hover { background: var(--telegram); color: #fff; }
+        
+        .pdf-btn { background: #fff; color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 
         .partner-section { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .partner-btn-gold { background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); padding: 12px 15px; border-radius: 10px; text-decoration: none; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; margin-bottom: 8px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
@@ -111,12 +101,26 @@
         .chart-wrapper { position: relative; height: 220px; width: 100%; margin-top:20px; }
         
         .cta-btn { background: linear-gradient(90deg, var(--accent), #f0e68c); color: #000; width: 90%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); text-decoration: none; display: block; text-align: center; text-transform: uppercase; margin: 25px auto 10px auto; }
-        .cta-btn:active { transform: scale(0.98); }
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
         .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; font-family: monospace; }
-        
         .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; }
+
+        /* MODAL STYLES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 15px; padding: 25px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-title { color: var(--accent); font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .modal-text { color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+        .modal-btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+
+        /* PDF HIDDEN CONTAINER */
+        #pdf-container { position: absolute; top: -9999px; left: -9999px; width: 595px; background: #fff; color: #000; padding: 40px; font-family: Arial, sans-serif; }
+        .pdf-header { text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 20px; margin-bottom: 30px; }
+        .pdf-logo { font-size: 24px; font-weight: bold; color: #000; }
+        .pdf-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .pdf-val { font-weight: bold; }
+        .pdf-footer { margin-top: 50px; font-size: 10px; color: #666; text-align: center; }
+
     </style>
 </head>
 <body>
@@ -126,9 +130,10 @@
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="openTab('pac')">Piano Accumulo</button>
-        <button class="tab-btn" onclick="openTab('rendita')">Rendita / Asset</button>
-        <button class="tab-btn" onclick="openTab('confronto')">Confronto</button>
+        <button class="tab-btn active" onclick="openTab('pac')">PAC</button>
+        <button class="tab-btn" onclick="openTab('rendita')">Rendita</button>
+        <button class="tab-btn" onclick="openTab('tools')">Strumenti 🛠️</button>
+        <button class="tab-btn" onclick="openTab('confronto')">Report</button>
     </div>
 
     <div id="pac" class="tab-content active">
@@ -146,71 +151,48 @@
                 <div class="step-display"><span class="step-label">Capitale Iniziale (€)</span><input type="number" id="pac-initial" value="5000" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('pac-initial', 500)">+</div>
             </div>
-
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-monthly', -50)">-</div>
                 <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('pac-monthly', 50)">+</div>
             </div>
-
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-years', -1)">-</div>
                 <div class="step-display"><span class="step-label">Durata (Anni)</span><input type="number" id="pac-years" value="15" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('pac-years', 1)">+</div>
             </div>
-
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-rate', -0.5)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span>
-                    <input type="number" id="pac-rate" value="8" step="0.5" onchange="calculateAll()">
-                </div>
+                <div class="step-display"><span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span><input type="number" id="pac-rate" value="8" step="0.5" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('pac-rate', 0.5)">+</div>
             </div>
-            
-             <div class="switch-container">
-                <div style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:5px;">
-                    Calcola Inflazione (Reale) <span class="info-icon" onclick="showInfo('inflation')">i</span>
-                </div>
+            <div class="switch-container">
+                <div style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:5px;">Calcola Inflazione (Reale) <span class="info-icon" onclick="showInfo('inflation')">i</span></div>
                 <label class="switch"><input type="checkbox" id="pac-inflation" onchange="calculateAll()"><span class="slider"></span></label>
             </div>
             
-            <div class="stepper-container" style="margin-top:15px; padding:5px 15px;">
-               <span class="step-label" style="margin-right:10px;">Costi Iniziali €</span>
-               <input type="number" id="pac-fees" value="0" onchange="calculateAll()" style="background:transparent; border:none; color:white; width:60px; text-align:right;">
+            <div style="margin-top:10px; font-size:10px; color:#aaa; text-align:center;" onclick="document.getElementById('pac-fees').focus()">
+                Costi d'ingresso: € <input type="number" id="pac-fees" value="0" onchange="calculateAll()" style="background:transparent; border:none; color:#aaa; width:40px;">
             </div>
 
             <div class="results-box">
                 <div style="font-size:11px; color:var(--text-sec); text-transform:uppercase;">Montante Finale Lordo</div>
-                <div class="res-value-main">
-                    <span id="res-pac-gross">€ 0</span>
-                    <span id="pac-game-icon" class="gamification-icon"></span>
-                </div>
+                <div class="res-value-main"><span id="res-pac-gross">€ 0</span><span id="pac-game-icon" class="gamification-icon"></span></div>
                 <div class="res-grid" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
                     <div><div class="res-item-small">Versato</div><div class="res-val-small" id="res-pac-invested">€ 0</div></div>
                     <div><div class="res-item-small">Guadagno</div><div class="res-val-small text-green" id="res-pac-gain">€ 0</div></div>
                 </div>
-                
                 <div class="share-btn" onclick="shareTelegram('pac')">✈️ Condividi su Telegram</div>
-
                 <div class="partner-section">
                     <div style="font-size:11px; color:var(--text-sec); margin-bottom:10px;">⚡ Inizia ora il tuo PAC:</div>
-                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold" 
-                       onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_pac'});">
-                        <span>Apri su <strong>Trade Republic</strong></span> ↗️
-                    </a>
+                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold" onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_pac'});"><span>Apri su <strong>Trade Republic</strong></span> ↗️</a>
                 </div>
             </div>
 
             <div class="card" style="margin-top:20px; background: linear-gradient(135deg, rgba(212,175,55,0.05), rgba(0,0,0,0));">
                  <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="color:var(--accent); font-weight:bold; font-size:13px; display:flex; align-items:center; gap:5px;">
-                        🔄 Ritiro Mensile <span class="info-icon" onclick="showInfo('tax')">i</span>
-                    </span>
-                    <select id="pac-tax-rate" class="tax-select" onchange="calculateAll()">
-                        <option value="26">26% ETF</option>
-                        <option value="12.5">12.5% Bond</option>
-                    </select>
+                    <span style="color:var(--accent); font-weight:bold; font-size:13px; display:flex; align-items:center; gap:5px;">🔄 Ritiro Mensile <span class="info-icon" onclick="showInfo('tax')">i</span></span>
+                    <select id="pac-tax-rate" class="tax-select" onchange="calculateAll()"><option value="26">26% ETF</option><option value="12.5">12.5% Bond</option></select>
                 </div>
                 <div class="stepper-container">
                     <div class="step-btn" onclick="changeVal('pac-withdraw-gross', -50)">-</div>
@@ -222,10 +204,7 @@
                     <div><div class="res-item-small">Durata</div><div class="res-val-small" style="font-size:11px;" id="res-pac-duration">---</div></div>
                 </div>
             </div>
-
-            <div class="chart-wrapper">
-                <canvas id="pacChart"></canvas>
-            </div>
+            <div class="chart-wrapper"><canvas id="pacChart"></canvas></div>
         </div>
     </div>
 
@@ -238,45 +217,34 @@
                     <button class="chart-btn" onclick="setChartMode('ren', 'pie')">Torta</button>
                 </div>
             </div>
-
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-asset-val', -5000)">-</div>
                 <div class="step-display"><span class="step-label">Valore Asset Totale (€)</span><input type="number" id="ren-asset-val" value="200000" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-asset-val', 5000)">+</div>
             </div>
-            
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-invested', -5000)">-</div>
                 <div class="step-display"><span class="step-label">Tuo Capitale Versato (€)</span><input type="number" id="ren-invested" value="50000" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-invested', 5000)">+</div>
             </div>
-
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-monthly', -50)">-</div>
                 <div class="step-display"><span class="step-label">Rendita Mensile Lorda (€)</span><input type="number" id="ren-monthly" value="800" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-monthly', 50)">+</div>
             </div>
-
              <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-growth', -0.5)">-</div>
                 <div class="step-display"><span class="step-label">Rivalutazione Annua (%)</span><input type="number" id="ren-growth" value="1.5" step="0.5" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-growth', 0.5)">+</div>
             </div>
-
             <div class="stepper-container" style="margin-top:10px;">
                 <div class="step-btn" onclick="changeVal('ren-years', -1)">-</div>
                 <div class="step-display"><span class="step-label">Proiezione Anni</span><input type="number" id="ren-years" value="15" onchange="calculateAll()"></div>
                 <div class="step-btn" onclick="changeVal('ren-years', 1)">+</div>
             </div>
-
             <div style="margin:15px 0; display:flex; justify-content:space-between; align-items:center;">
                 <label>Tassazione:</label>
-                <select id="ren-tax-rate" class="tax-select" onchange="calculateAll()">
-                    <option value="21">21% Cedolare</option>
-                    <option value="10">10% Concordato</option>
-                    <option value="26">26% Finanz.</option>
-                    <option value="43">43% IRPEF</option>
-                </select>
+                <select id="ren-tax-rate" class="tax-select" onchange="calculateAll()"><option value="21">21% Cedolare</option><option value="10">10% Concordato</option><option value="26">26% Finanz.</option><option value="43">43% IRPEF</option></select>
             </div>
              <div class="switch-container">
                 <div style="font-size:12px; color:#aaa;">Calcola Inflazione</div>
@@ -285,57 +253,92 @@
 
             <div class="results-box">
                 <div style="font-size:11px; color:var(--text-sec);">Ricchezza Totale (Asset + Cash)</div>
-                <div class="res-value-main">
-                    <span id="res-ren-total-val">€ 0</span>
-                    <span id="ren-game-icon" class="gamification-icon"></span>
-                </div>
-
+                <div class="res-value-main"><span id="res-ren-total-val">€ 0</span><span id="ren-game-icon" class="gamification-icon"></span></div>
                 <div class="res-grid">
                     <div><div class="res-item-small">Valore Asset</div><div class="res-val-small" id="res-ren-final-asset">€ 0</div></div>
                     <div><div class="res-item-small">Cash Incassato</div><div class="res-val-small text-green" id="res-ren-total-cash">€ 0</div></div>
                 </div>
-                
                 <div style="margin-top:15px; display:flex; justify-content:space-around; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
                     <div><div class="res-item-small">ROI</div><div class="res-val-small text-gold" id="res-ren-roi">0%</div></div>
                     <div><div class="res-item-small">Netto/Mese</div><div class="res-val-small" id="res-ren-monthly-net">€ 0</div></div>
                 </div>
-
                 <div class="share-btn" onclick="shareTelegram('ren')">✈️ Condividi su Telegram</div>
-
                  <div class="partner-section">
                     <div style="font-size:11px; color:var(--text-sec); margin-bottom:10px;">⚡ Ottieni il 3.75% sulla liquidità:</div>
-                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold"
-                       onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_ren'});">
-                        <span>Attiva su <strong>Trade Republic</strong></span> ↗️
-                    </a>
+                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold" onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_ren'});"><span>Attiva su <strong>Trade Republic</strong></span> ↗️</a>
                 </div>
             </div>
+            <div class="chart-wrapper"><canvas id="renChart"></canvas></div>
+        </div>
+    </div>
+
+    <div id="tools" class="tab-content">
+        <div class="card">
+            <div class="card-title">☕ Distruttore di Sprechi</div>
+            <p style="font-size:12px; color:#aaa; margin-bottom:15px;">Trasforma i vizi in ricchezza. Quanto spendi ogni giorno?</p>
             
-            <div class="chart-wrapper">
-                <canvas id="renChart"></canvas>
+            <div class="stepper-container">
+                <div style="font-size:20px;">💸</div>
+                <input type="number" id="waste-daily" placeholder="Es. 5€ (Sigarette/Caffè)" style="background:transparent; border:none; color:#fff; text-align:center; width:100%; font-size:16px;" oninput="calcWaste()">
+            </div>
+            <div class="results-box" style="margin-top:10px;">
+                <div class="res-item-small">In 20 anni stai bruciando:</div>
+                <div class="res-value-main text-danger" id="waste-result">€ 0</div>
+                <div class="res-item-small">Se li avessi investiti all'8%:</div>
+                <div class="res-value-main text-green" id="waste-invested">€ 0</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">⏳ Time Machine</div>
+            <p style="font-size:12px; color:#aaa; margin-bottom:15px;">Se avessi investito 1.000€ nel 2014, oggi avresti...</p>
+            
+            <select id="time-asset" class="tax-select" style="width:100%; padding:10px; margin-bottom:10px;" onchange="calcTimeMachine()">
+                <option value="sp500">🇺🇸 S&P 500 (USA)</option>
+                <option value="bitcoin">₿ Bitcoin</option>
+                <option value="gold">🥇 Oro</option>
+            </select>
+            <div class="results-box">
+                <div class="res-item-small">Capitale Oggi:</div>
+                <div class="res-value-main text-gold" id="time-result">---</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🏖️ Calcolatore F.I.R.E.</div>
+            <p style="font-size:12px; color:#aaa; margin-bottom:15px;">Quanto serve per smettere di lavorare?</p>
+            
+            <div class="stepper-container">
+                <div style="font-size:12px; color:#aaa;">Spese/Mese:</div>
+                <input type="number" id="fire-expenses" value="1500" style="background:transparent; border:none; color:#fff; text-align:right; width:80px;" oninput="calcFire()">
+            </div>
+             <div class="results-box">
+                <div class="res-item-small">Ti servono:</div>
+                <div class="res-value-main" id="fire-target">€ 450.000</div>
+                <div class="res-item-small">Regola del 4%</div>
             </div>
         </div>
     </div>
 
     <div id="confronto" class="tab-content">
         <div class="card">
-            <div class="card-title" style="margin-bottom:20px; text-align:center;">🆚 Analisi Finale</div>
-            <p style="text-align:center; font-size:12px; color:var(--text-sec);">Confronto a <span id="comp-years">15</span> anni</p>
-
+            <div class="card-title" style="margin-bottom:20px; text-align:center;">🆚 Analisi & Report</div>
             <div class="comp-box" style="border-left: 4px solid #2979ff; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px; margin-bottom:10px;">
                 <div style="font-size:12px; color:#aaa;">Strategia PAC</div>
                 <div style="font-size:20px; font-weight:bold; color:#fff;" id="comp-pac-end">€ 0</div>
             </div>
-
             <div class="comp-box" style="border-left: 4px solid #d4af37; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px;">
                 <div style="font-size:12px; color:#aaa;">Strategia Rendita</div>
                 <div style="font-size:20px; font-weight:bold; color:#fff;" id="comp-ren-end">€ 0</div>
             </div>
-
             <div style="background:rgba(0,230,118,0.1); padding:15px; border-radius:10px; margin-top:20px; text-align:center;">
                 <div class="res-item-small">VINCITORE</div>
                 <div id="comp-winner-text" style="font-size:18px; font-weight:800; color:var(--success); margin-top:5px;">---</div>
             </div>
+            
+            <button class="pdf-btn" onclick="generatePDF()">
+                📥 Scarica Report PDF (Pro)
+            </button>
         </div>
     </div>
 
@@ -344,8 +347,8 @@
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
 
     <div class="disclaimer">
-        <strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.
-        <br><br>© Selecta Italia - v1.0 Stable Release
+        <strong>DISCLAIMER:</strong> I calcoli sono puramente indicativi. Non costituiscono consulenza finanziaria.
+        <br><br>© Selecta Italia - v2.0 Ultimate
     </div>
     
     <div style="height: 20px;"></div>
@@ -353,8 +356,29 @@
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
             <div id="modalTitle" class="modal-title">Info</div>
-            <div id="modalText" class="modal-text">Dettaglio info...</div>
+            <div id="modalText" class="modal-text">...</div>
             <button class="modal-btn" onclick="closeInfo()">Chiudi</button>
+        </div>
+    </div>
+
+    <div id="pdf-container">
+        <div class="pdf-header">
+            <div class="pdf-logo">SELECTA ITALIA</div>
+            <div>Report Finanziario Personale</div>
+        </div>
+        <h3>Analisi Piano di Accumulo</h3>
+        <div class="pdf-row"><div>Versamento Mensile:</div><div class="pdf-val" id="pdf-monthly"></div></div>
+        <div class="pdf-row"><div>Durata:</div><div class="pdf-val" id="pdf-years"></div></div>
+        <div class="pdf-row"><div>Rendimento Stimato:</div><div class="pdf-val" id="pdf-rate"></div></div>
+        <div class="pdf-row" style="margin-top:20px; border-top:2px solid #000;"><div>Capitale Finale Stimato:</div><div class="pdf-val" id="pdf-total" style="font-size:20px;"></div></div>
+        <div class="pdf-row"><div>Guadagno Netto:</div><div class="pdf-val" id="pdf-gain"></div></div>
+        
+        <h3 style="margin-top:40px;">Strategia Alternativa (Rendita)</h3>
+        <div class="pdf-row"><div>Valore Asset + Cash:</div><div class="pdf-val" id="pdf-ren-total"></div></div>
+        
+        <div class="pdf-footer">
+            Generato automaticamente da Selecta Financial Suite.<br>
+            I dati sono simulazioni e non costituiscono garanzia di rendimento.
         </div>
     </div>
 
@@ -368,52 +392,7 @@
         let renMode = 'line';
         const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-        // --- INFO MODAL LOGIC ---
-        const infoData = {
-            'rate': { title: "Rendimento Atteso", text: "Il mercato azionario globale (MSCI World / S&P 500) ha storicamente reso circa il 7-9% annuo. Usa 4% per profili prudenti, 8% per aggressivi." },
-            'inflation': { title: "Inflazione Reale", text: "L'inflazione (stimata al 2% annuo) riduce il potere d'acquisto. Attivando questa opzione, vedrai quanto varranno i tuoi soldi 'domani' con i prezzi di oggi." },
-            'tax': { title: "Tassazione", text: "In Italia, le plusvalenze da ETF/Azioni sono tassate al 26%. I Titoli di Stato (BTP/Bond governativi) godono di aliquota agevolata al 12.5%." }
-        };
-
-        function showInfo(key) {
-            const data = infoData[key];
-            if(data) {
-                document.getElementById('modalTitle').innerText = data.title;
-                document.getElementById('modalText').innerText = data.text;
-                document.getElementById('infoModal').style.display = 'flex';
-            }
-        }
-        function closeInfo() {
-            document.getElementById('infoModal').style.display = 'none';
-        }
-
-        // --- GAMIFICATION LOGIC ---
-        function getGameIcon(amount) {
-            if(amount < 10000) return "🛴"; // Monopattino
-            if(amount < 30000) return "🛵"; // Scooter
-            if(amount < 100000) return "🚗"; // Auto
-            if(amount < 250000) return "🏎️"; // Supercar
-            if(amount < 500000) return "🏠"; // Casa
-            return "🛥️"; // Yacht / Libertà
-        }
-
-        // --- SHARE LOGIC ---
-        function shareTelegram(type) {
-            let text = "";
-            if(type === 'pac') {
-                let monthly = document.getElementById('pac-monthly').value;
-                let years = document.getElementById('pac-years').value;
-                let total = document.getElementById('res-pac-gross').innerText;
-                text = `📊 Ho appena simulato il mio Piano di Accumulo: investendo ${monthly}€ al mese per ${years} anni potrei ottenere ${total}! 🤯\n\nCalcola anche tu il tuo qui: https://t.me/SelectaHelpBot`;
-            } else {
-                let total = document.getElementById('res-ren-total-val').innerText;
-                text = `🏠 Ho simulato la mia rendita immobiliare/asset: potrei generare una ricchezza totale di ${total}! 💰\n\nFai il calcolo qui: https://t.me/SelectaHelpBot`;
-            }
-            // Apre il link di condivisione Telegram
-            const url = `https://t.me/share/url?url=${encodeURIComponent(text)}`;
-            tg.openTelegramLink(url);
-        }
-
+        // --- CORE FUNCTIONS ---
         function changeVal(id, amount) {
             const input = document.getElementById(id);
             let val = parseFloat(input.value) || 0;
@@ -423,7 +402,6 @@
             input.value = newVal;
             calculateAll();
         }
-
         function setChartMode(chart, mode) {
             if(chart === 'pac') { pacMode = mode; calculatePAC(); }
             if(chart === 'ren') { renMode = mode; calculateRen(); }
@@ -431,39 +409,6 @@
             parent.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
         }
-
-        function saveData() {
-            const inputs = document.querySelectorAll('input, select');
-            let data = {};
-            inputs.forEach(el => {
-                if(el.id) {
-                    if(el.type === 'checkbox') data[el.id] = el.checked;
-                    else data[el.id] = el.value;
-                }
-            });
-            localStorage.setItem('selectaData_v3', JSON.stringify(data));
-        }
-
-        function loadData() {
-            const data = JSON.parse(localStorage.getItem('selectaData_v3'));
-            if(data) {
-                for (const [key, value] of Object.entries(data)) {
-                    const el = document.getElementById(key);
-                    if(el) {
-                        if(el.type === 'checkbox') el.checked = value;
-                        else el.value = value;
-                    }
-                }
-            }
-        }
-
-        function clearData() {
-            if(confirm('Vuoi resettare i dati?')) {
-                localStorage.removeItem('selectaData_v3');
-                location.reload();
-            }
-        }
-
         function openTab(id) {
             document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
@@ -472,12 +417,80 @@
             if(id === 'confronto') updateComparison();
         }
 
-        function calculateAll() {
-            calculatePAC();
-            calculateRen();
-            saveData(); 
+        // --- INFO & GAME ---
+        const infoData = {
+            'rate': { title: "Rendimento", text: "Media storica S&P500: ~9% annuo. Profilo prudente: 4%. Aggressivo: 8-10%." },
+            'inflation': { title: "Inflazione", text: "L'inflazione (~2%) riduce il valore dei soldi. Attiva per vedere il potere d'acquisto reale futuro." },
+            'tax': { title: "Tasse", text: "Italia: 26% su Azioni/ETF. 12.5% su Titoli di Stato." }
+        };
+        function showInfo(key) {
+            document.getElementById('modalTitle').innerText = infoData[key].title;
+            document.getElementById('modalText').innerText = infoData[key].text;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+        function closeInfo() { document.getElementById('infoModal').style.display = 'none'; }
+        function getGameIcon(amount) {
+            if(amount < 10000) return "🛴"; if(amount < 30000) return "🛵"; if(amount < 100000) return "🚗";
+            if(amount < 250000) return "🏎️"; if(amount < 500000) return "🏠"; return "🛥️";
+        }
+        function shareTelegram(type) {
+            let text = type === 'pac' 
+                ? `📊 PAC Selecta: Con i miei risparmi potrei raggiungere ${document.getElementById('res-pac-gross').innerText}! Calcola il tuo: https://t.me/SelectaHelpBot`
+                : `🏠 Rendita Selecta: I miei asset potrebbero valere ${document.getElementById('res-ren-total-val').innerText}! Calcola qui: https://t.me/SelectaHelpBot`;
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(text)}`);
         }
 
+        // --- NEW TOOLS ---
+        function calcWaste() {
+            let daily = parseFloat(document.getElementById('waste-daily').value) || 0;
+            let years = 20;
+            let burned = daily * 365 * years;
+            // Compound interest formula: FV = P * (((1 + r)^n - 1) / r) for annual contributions
+            // Simplified: Daily investment compounded annually at 8%
+            let yearlyInv = daily * 365;
+            let rate = 0.08;
+            let invested = yearlyInv * ((Math.pow(1 + rate, years) - 1) / rate);
+            
+            document.getElementById('waste-result').innerText = fmt.format(burned);
+            document.getElementById('waste-invested').innerText = fmt.format(invested);
+        }
+        function calcTimeMachine() {
+            let asset = document.getElementById('time-asset').value;
+            let base = 1000;
+            let mult = 1;
+            if(asset === 'sp500') mult = 3.2; // ~220% in 10y
+            if(asset === 'bitcoin') mult = 120; // Massive growth
+            if(asset === 'gold') mult = 1.8; // ~80%
+            document.getElementById('time-result').innerText = fmt.format(base * mult);
+        }
+        function calcFire() {
+            let exp = parseFloat(document.getElementById('fire-expenses').value) || 0;
+            let target = exp * 12 * 25; // Rule of 25 (4% withdrawal)
+            document.getElementById('fire-target').innerText = fmt.format(target);
+        }
+
+        // --- PDF GENERATION ---
+        function generatePDF() {
+            // Populate PDF Data
+            document.getElementById('pdf-monthly').innerText = document.getElementById('pac-monthly').value + ' €';
+            document.getElementById('pdf-years').innerText = document.getElementById('pac-years').value + ' Anni';
+            document.getElementById('pdf-rate').innerText = document.getElementById('pac-rate').value + '%';
+            document.getElementById('pdf-total').innerText = document.getElementById('res-pac-gross').innerText;
+            document.getElementById('pdf-gain').innerText = document.getElementById('res-pac-gain').innerText;
+            document.getElementById('pdf-ren-total').innerText = document.getElementById('res-ren-total-val').innerText;
+
+            const element = document.getElementById('pdf-container');
+            const opt = {
+                margin: 10,
+                filename: 'Report_Selecta_Italia.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // --- CALCULATIONS ---
         function calculatePAC() {
             let P = parseFloat(document.getElementById('pac-initial').value) || 0;
             let PMT = parseFloat(document.getElementById('pac-monthly').value) || 0;
@@ -491,40 +504,27 @@
             let inflationRate = useInflation ? 0.02 : 0;
             let months = years * 12;
             let monthlyRate = rate / 12;
-            
             let currentTotal = P - costs;
             let currentInvested = P;
-
-            let labels = [];
-            let dataTot = [];
-            let dataInv = [];
+            let labels = []; let dataTot = []; let dataInv = [];
 
             for(let i=1; i<=months; i++){
                 currentTotal = (currentTotal + PMT) * (1 + monthlyRate);
                 currentInvested += PMT;
-                if(i % 12 === 0) {
-                     labels.push(`A${i/12}`);
-                     dataTot.push(currentTotal);
-                     dataInv.push(currentInvested);
-                }
+                if(i % 12 === 0) { labels.push(`A${i/12}`); dataTot.push(currentTotal); dataInv.push(currentInvested); }
             }
-
             let grossFinal = currentTotal;
+            if(useInflation) grossFinal = grossFinal / Math.pow(1+inflationRate, years);
+
             let gainTotal = grossFinal - currentInvested;
-            
-            // Decumulo
             let gainRatio = (gainTotal > 0 && grossFinal > 0) ? (gainTotal / grossFinal) : 0;
             let taxAmount = (withdrawGross * gainRatio) * taxRate;
             let netWithdrawal = withdrawGross - taxAmount;
             
-            let sustainabilityText = "Nessun prelievo";
+            let sustainabilityText = withdrawGross > 0 ? "Calcolo..." : "Nessun prelievo";
             if(withdrawGross > 0) {
-                 let temp = grossFinal;
-                 let m = 0;
-                 while(temp > 0 && m < 600) {
-                     temp = temp * (1 + monthlyRate) - withdrawGross;
-                     m++;
-                 }
+                 let temp = grossFinal; let m = 0;
+                 while(temp > 0 && m < 600) { temp = temp * (1 + monthlyRate) - withdrawGross; m++; }
                  sustainabilityText = m >= 600 ? "> 50 Anni" : `${Math.floor(m/12)} anni, ${m%12} mesi`;
             }
 
@@ -533,15 +533,10 @@
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
             document.getElementById('res-pac-net-monthly').innerText = fmt.format(netWithdrawal);
             document.getElementById('res-pac-duration').innerText = sustainabilityText;
-            
-            // UPDATE ICON
             document.getElementById('pac-game-icon').innerText = getGameIcon(grossFinal);
 
-            if (pacMode === 'pie') {
-                updateChart('pacChart', 'pie', ['Versato', 'Guadagno'], [currentInvested, gainTotal], ['#004d40', '#00e676']);
-            } else {
-                updateChart('pacChart', 'line', labels, dataTot, '#00e676');
-            }
+            if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Versato', 'Guadagno'], [currentInvested, gainTotal], ['#004d40', '#00e676']);
+            else updateChart('pacChart', 'line', labels, dataTot, '#00e676');
             updateComparison();
         }
 
@@ -557,8 +552,7 @@
             let rentNet = Rent * (1 - tax);
             let currentAsset = Asset;
             let cash = 0;
-            let labels = [];
-            let dataWealth = [];
+            let labels = []; let dataWealth = [];
 
             for(let i=1; i<=years; i++){
                 currentAsset = currentAsset * (1 + growth);
@@ -566,10 +560,8 @@
                 labels.push(`A${i}`);
                 dataWealth.push(currentAsset + cash);
             }
-            
             let totalWealth = currentAsset + cash;
             if(useInflation) totalWealth = totalWealth / Math.pow(1.02, years);
-
             let roi = ((rentNet * 12) / Invested) * 100;
 
             document.getElementById('res-ren-total-val').innerText = fmt.format(totalWealth);
@@ -577,15 +569,10 @@
             document.getElementById('res-ren-total-cash').innerText = fmt.format(cash);
             document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
             document.getElementById('res-ren-monthly-net').innerText = fmt.format(rentNet);
-            
-            // UPDATE ICON
             document.getElementById('ren-game-icon').innerText = getGameIcon(totalWealth);
 
-            if (renMode === 'pie') {
-                updateChart('renChart', 'pie', ['Valore Asset', 'Cash Generato'], [currentAsset, cash], ['#8a701e', '#d4af37']);
-            } else {
-                updateChart('renChart', 'line', labels, dataWealth, '#d4af37');
-            }
+            if (renMode === 'pie') updateChart('renChart', 'pie', ['Valore Asset', 'Cash Generato'], [currentAsset, cash], ['#8a701e', '#d4af37']);
+            else updateChart('renChart', 'line', labels, dataWealth, '#d4af37');
             updateComparison();
         }
 
@@ -593,42 +580,29 @@
             document.getElementById('comp-years').innerText = document.getElementById('pac-years').value;
             let vPac = parseLocaleNum(document.getElementById('res-pac-gross').innerText);
             let vRen = parseLocaleNum(document.getElementById('res-ren-total-val').innerText);
-            
             document.getElementById('comp-pac-end').innerText = fmt.format(vPac);
             document.getElementById('comp-ren-end').innerText = fmt.format(vRen);
-            
-            let winner = vPac > vRen ? "STRATEGIA PAC 🏆" : (vRen > vPac ? "STRATEGIA RENDITA 🏆" : "PAREGGIO");
-            document.getElementById('comp-winner-text').innerText = winner;
+            document.getElementById('comp-winner-text').innerText = vPac > vRen ? "STRATEGIA PAC 🏆" : (vRen > vPac ? "STRATEGIA RENDITA 🏆" : "PAREGGIO");
         }
-
         function parseLocaleNum(str) { return parseFloat(str.replace(/[^0-9,-]+/g,"").replace(',','.').replace('€','').trim()); }
 
         function updateChart(id, type, labels, data, colors) {
             const ctx = document.getElementById(id).getContext('2d');
             let instance = (id === 'pacChart') ? pacChart : renChart;
             if(instance) instance.destroy();
-
-            let config = {};
-            if (type === 'line') {
-                config = {
-                    type: 'line',
-                    data: { labels: labels, datasets: [{ data: data, borderColor: colors, backgroundColor: colors + '22', fill: true, tension: 0.3, pointRadius: 0 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, interaction: { intersect: false, mode: 'index' } }
-                };
-            } else {
-                config = {
-                    type: 'doughnut',
-                    data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#ccc', boxWidth: 10, font: {size: 10} } } } }
-                };
-            }
+            let config = type === 'line' 
+                ? { type: 'line', data: { labels: labels, datasets: [{ data: data, borderColor: colors, backgroundColor: colors + '22', fill: true, tension: 0.3, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, interaction: { intersect: false, mode: 'index' } } }
+                : { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#ccc', boxWidth: 10, font: {size: 10} } } } } };
             let newChart = new Chart(ctx, config);
-            if(id === 'pacChart') pacChart = newChart;
-            else renChart = newChart;
+            if(id === 'pacChart') pacChart = newChart; else renChart = newChart;
         }
 
-        loadData();
+        // Init
+        const saved = JSON.parse(localStorage.getItem('selectaData_v3'));
+        if(saved) for(const [k,v] of Object.entries(saved)) { const el=document.getElementById(k); if(el) el.type==='checkbox'?el.checked=v:el.value=v; }
         calculateAll();
+        // Calc initial tools
+        calcWaste(); calcTimeMachine(); calcFire();
     </script>
 </body>
 </html>

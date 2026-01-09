@@ -24,7 +24,8 @@
         html { 
             background: linear-gradient(180deg, #001220 0%, #000000 100%); 
             min-height: 100vh; 
-            overscroll-behavior: none; /* Evita rimbalzi su iOS */
+            overscroll-behavior: none; 
+            touch-action: pan-y; 
         }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -79,22 +80,19 @@
             border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; cursor: pointer;
         }
 
-        /* --- SLIDER FIX PER MOBILE --- */
+        /* --- SLIDER FIX PER MOBILE (CSS AVANZATO) --- */
         input[type=range] { 
             -webkit-appearance: none; 
             width: 100%; 
             background: transparent;
-            height: 30px; /* Aumentata area tocco */
-            touch-action: none; /* FONDAMENTALE: Blocca lo scroll della pagina mentre tocchi lo slider */
+            height: 40px; 
             cursor: pointer;
-            position: relative;
-            z-index: 10;
             margin: 0;
             padding: 0;
+            touch-action: none !important; 
         }
         input[type=range]:focus { outline: none; }
         
-        /* Binario (Track) */
         input[type=range]::-webkit-slider-runnable-track { 
             width: 100%; 
             height: 6px; 
@@ -104,14 +102,13 @@
             border: none;
         }
         
-        /* Pallino (Thumb) */
         input[type=range]::-webkit-slider-thumb { 
-            height: 24px; /* Leggermente più grande */
+            height: 24px; 
             width: 24px; 
             border-radius: 50%; 
             background: var(--accent); 
             box-shadow: 0 0 10px rgba(212,175,55,0.5); 
-            margin-top: -9px; /* Centratura precisa */
+            margin-top: -9px; 
             border: 2px solid #000; 
             -webkit-appearance: none;
         }
@@ -253,7 +250,7 @@
             </div>
             <div class="input-group">
                 <div class="label-row"><label>Anni Accumulo</label><div class="value-display"><input type="number" id="pac-years" value="15" oninput="sync('pac','years')"></div></div>
-                <input type="range" id="rng-pac-years" min="1" max="40" step="1" value="15" oninput="sync('pac-years')">
+                <input type="range" id="rng-pac-years" min="1" max="40" step="1" value="15" oninput="sync('pac','years')">
             </div>
             <div class="input-group">
                 <div class="label-row"><label>Rendimento %</label><div class="value-display"><input type="number" id="pac-rate" value="8" oninput="sync('pac','rate')"></div></div>
@@ -473,7 +470,7 @@
         let renMode = 'line';
         const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-        // --- SISTEMA SALVATAGGIO DATI (Local Storage) ---
+        // --- SISTEMA SALVATAGGIO DATI ---
         function saveData() {
             const inputs = document.querySelectorAll('input, select');
             let data = {};
@@ -512,7 +509,6 @@
         }
 
         // --- FUNZIONI CORE ---
-
         function openTab(id) {
             document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
@@ -753,6 +749,13 @@
         document.querySelectorAll('input, select').forEach(el => {
             el.addEventListener('input', () => { if(el.type !== 'range') calculateAll(); });
             el.addEventListener('change', calculateAll);
+        });
+
+        // --- FIX FINALE TOUCH MOBILE ---
+        // Forza lo slider a rispondere anche se il browser vorrebbe scrollare
+        document.querySelectorAll('input[type="range"]').forEach(range => {
+            range.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: false});
+            range.addEventListener('touchmove', function(e) { e.stopPropagation(); }, {passive: false});
         });
 
     </script>

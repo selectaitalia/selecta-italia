@@ -24,6 +24,7 @@
         html { 
             background: linear-gradient(180deg, #001220 0%, #000000 100%); 
             min-height: 100vh; 
+            overscroll-behavior: none; /* Evita rimbalzi su iOS */
         }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -65,7 +66,7 @@
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
 
-        /* INPUTS E SLIDER */
+        /* INPUTS E SLIDER - FIX TOUCH MOBILE */
         .input-group { margin-bottom: 20px; }
         .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         label { font-size: 13px; color: var(--text-sec); }
@@ -73,17 +74,47 @@
         .value-display { font-family: 'Roboto Mono', monospace; font-weight: 700; color: #fff; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 6px; font-size: 14px; min-width: 80px; text-align: right; border: 1px solid rgba(255,255,255,0.1); }
         .value-display input { background: transparent; border: none; color: inherit; width: 70px; text-align: right; outline: none; padding: 0; margin: 0; }
         
-        /* Dropdown Tasse */
         .tax-select {
             background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff;
             border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; cursor: pointer;
         }
 
-        /* Slider Custom */
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        /* --- SLIDER FIX PER MOBILE --- */
+        input[type=range] { 
+            -webkit-appearance: none; 
+            width: 100%; 
+            background: transparent;
+            height: 30px; /* Aumentata area tocco */
+            touch-action: none; /* FONDAMENTALE: Blocca lo scroll della pagina mentre tocchi lo slider */
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+            margin: 0;
+            padding: 0;
+        }
         input[type=range]:focus { outline: none; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 3px; }
-        input[type=range]::-webkit-slider-thumb { height: 22px; width: 22px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px rgba(212,175,55,0.5); margin-top: -8px; border: 2px solid #000; }
+        
+        /* Binario (Track) */
+        input[type=range]::-webkit-slider-runnable-track { 
+            width: 100%; 
+            height: 6px; 
+            cursor: pointer; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 3px; 
+            border: none;
+        }
+        
+        /* Pallino (Thumb) */
+        input[type=range]::-webkit-slider-thumb { 
+            height: 24px; /* Leggermente più grande */
+            width: 24px; 
+            border-radius: 50%; 
+            background: var(--accent); 
+            box-shadow: 0 0 10px rgba(212,175,55,0.5); 
+            margin-top: -9px; /* Centratura precisa */
+            border: 2px solid #000; 
+            -webkit-appearance: none;
+        }
 
         /* SWITCH INFLAZIONE */
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
@@ -120,7 +151,7 @@
         .comp-header { font-size: 12px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 5px; }
         .comp-val { font-size: 20px; font-weight: 700; color: #fff; }
 
-        /* --- NUOVO: BOX REFERRAL PARTNER (SINGLE) --- */
+        /* BOX REFERRAL PARTNER */
         .partner-section {
             margin-top: 20px;
             padding-top: 15px;
@@ -134,7 +165,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        /* Stile Bottone Unico Gold */
         .partner-btn-gold {
             background: linear-gradient(45deg, #111, #222);
             border: 1px solid var(--accent);
@@ -431,7 +461,9 @@
         © Selecta Italia - Tutti i diritti riservati.
     </div>
     
-    <div style="height: 20px;"></div> <script>
+    <div style="height: 20px;"></div>
+
+    <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
@@ -465,7 +497,6 @@
                     }
                 }
             }
-            // Aggiorna tutti gli slider visivamente
             document.querySelectorAll('input[type=range]').forEach(rng => {
                 const idNum = rng.id.replace('rng-', '');
                 const inp = document.getElementById(idNum);
@@ -547,18 +578,13 @@
             let gainTotal = grossFinal - currentInvested;
             let realValue = grossFinal / Math.pow(1 + inflationRate, years);
 
-            // LOGICA DECUMULO: Calcolo Tasse Pro-Quota sul prelievo
-            // Gain Ratio = La percentuale di guadagno nel capitale totale
             let gainRatio = (gainTotal > 0 && grossFinal > 0) ? (gainTotal / grossFinal) : 0;
-            
-            // Su ogni prelievo mensile, solo la parte relativa al gain è tassata
             let taxablePart = withdrawGross * gainRatio;
             let taxAmount = taxablePart * taxRate;
             let netWithdrawal = withdrawGross - taxAmount;
 
             let sustainabilityText = "Nessun prelievo";
             if(withdrawGross > 0) {
-                // Simulazione esaurimento
                 let tempCap = grossFinal;
                 let monthsLast = 0;
                 while(tempCap > 0 && monthsLast < 600) { 
@@ -573,7 +599,6 @@
                 }
             }
 
-            // Aggiornamento UI PAC
             document.getElementById('res-pac-gross').innerText = fmt.format(grossFinal);
             document.getElementById('res-pac-invested').innerText = fmt.format(currentInvested);
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
@@ -627,7 +652,6 @@
             let roi = totalInvestedReal > 0 ? ((RentNet * 12) / totalInvestedReal) * 100 : 0;
             let yieldVal = AssetVal > 0 ? ((RentNet * 12) / AssetVal) * 100 : 0;
 
-            // Aggiornamento UI Rendita
             document.getElementById('res-ren-total-val').innerText = fmt.format(finalWealth);
             document.getElementById('res-ren-real').innerText = useInflation ? fmt.format(realWealth) : "Non attivo";
             document.getElementById('res-ren-final-asset').innerText = fmt.format(currentAsset);
@@ -723,11 +747,9 @@
             else renChart = newChart;
         }
 
-        // Init: Carica dati e avvia
         loadData();
         calculateAll();
 
-        // Listener globale per aggiornare al cambio di qualsiasi input
         document.querySelectorAll('input, select').forEach(el => {
             el.addEventListener('input', () => { if(el.type !== 'range') calculateAll(); });
             el.addEventListener('change', calculateAll);

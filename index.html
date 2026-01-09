@@ -14,7 +14,8 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-42QMLWNCQ1');
+      // 'debug_mode': true serve per vedere i dati SUBITO in DebugView
+      gtag('config', 'G-42QMLWNCQ1', { 'debug_mode': true });
     </script>
 
     <style>
@@ -35,6 +36,7 @@
             background: linear-gradient(180deg, #001220 0%, #000000 100%); 
             min-height: 100vh; 
             overscroll-behavior: none; 
+            /* Importante: permette lo scroll della pagina MA rispetta gli elementi interni */
             touch-action: pan-y; 
         }
         body {
@@ -72,16 +74,18 @@
         
         .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; cursor: pointer; }
 
-        /* --- SLIDER FIX PER MOBILE (CSS PURO) --- */
+        /* --- SLIDER FIX V1.1 (SOLO CSS) --- */
         input[type=range] { 
             -webkit-appearance: none; 
             width: 100%; 
             background: transparent;
-            height: 40px; 
+            height: 40px; /* Area tocco grande */
             cursor: pointer;
             margin: 0;
             padding: 0;
-            touch-action: none; /* Questa è la chiave per il touch */
+            /* Blocca lo scroll della pagina SOLO se tocchi lo slider */
+            touch-action: none !important; 
+            z-index: 10;
         }
         input[type=range]:focus { outline: none; }
         
@@ -131,7 +135,6 @@
         hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0; }
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
         
-        /* VERSIONE 1.0 */
         .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; font-family: monospace; }
     </style>
 </head>
@@ -371,7 +374,7 @@
         © Selecta Italia - Tutti i diritti riservati.
     </div>
     
-    <div class="version-tag">v1.0 - Stable Release</div>
+    <div class="version-tag">v1.1 - Debug Mode</div>
     <div style="height: 20px;"></div>
 
     <script>
@@ -656,11 +659,7 @@
             el.addEventListener('change', calculateAll);
         });
 
-        const ranges = document.querySelectorAll('input[type="range"]');
-        ranges.forEach(range => {
-            range.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: false});
-            range.addEventListener('touchmove', function(e) { e.stopPropagation(); }, {passive: false});
-        });
+        // NESSUN JS PER IL TOUCH QUI: USIAMO SOLO IL CSS
     </script>
 </body>
 </html>

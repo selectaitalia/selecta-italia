@@ -7,13 +7,15 @@
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-42QMLWNCQ1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-42QMLWNCQ1');
+      gtag('config', 'G-42QMLWNCQ1', { 'debug_mode': true });
     </script>
 
     <style>
@@ -41,8 +43,10 @@
             user-select: none;
         }
 
-        .header { display: flex; justify-content: center; margin-bottom: 20px; margin-top: 10px; }
-        .logo-img { width: 140px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); }
+        /* HEADER & USERNAME */
+        .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; margin-top: 10px; }
+        .logo-img { width: 140px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); margin-bottom: 10px; }
+        .user-welcome { font-size: 18px; font-weight: bold; color: var(--accent); text-align: center; }
 
         /* TABS */
         .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto; }
@@ -57,33 +61,34 @@
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
 
+        /* CHART CONTROLS */
         .chart-controls { display: flex; gap: 5px; }
         .chart-btn { background: rgba(255,255,255,0.1); border: none; color: var(--text-sec); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .chart-btn.active { background: var(--accent); color: #000; }
 
         /* STEPPER */
-        .stepper-container { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 5px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .stepper-container { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 5px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .step-btn { background: linear-gradient(145deg, #222, #111); border: 1px solid var(--accent-dim); color: var(--accent); width: 45px; height: 45px; border-radius: 10px; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.1s; }
         .step-btn:active { transform: scale(0.9); background: var(--accent); color: #000; }
         .step-display { flex: 1; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; }
         .step-display input { background: transparent; border: none; color: #fff; text-align: center; font-size: 18px; font-weight: 700; width: 100%; outline: none; -moz-appearance: textfield; }
         .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
 
-        /* PULSANTI ACTION */
-        .action-group { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+        /* PULSANTI ACTION (Linearità) */
+        .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
         
-        .crash-btn { width: 100%; background: rgba(255, 82, 82, 0.1); border: 1px solid var(--danger); color: #ff8a80; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; box-sizing: border-box; }
+        .crash-btn { width: 100%; background: rgba(255, 82, 82, 0.1); border: 1px solid var(--danger); color: #ff8a80; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; }
         .crash-btn.active { background: var(--danger); color: #fff; }
 
-        .share-btn { width: 100%; background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); color: var(--telegram); padding: 12px; border-radius: 10px; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-sizing: border-box; }
+        .share-btn { width: 100%; background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); color: var(--telegram); padding: 10px; border-radius: 10px; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-sizing: border-box; }
         .share-btn:hover { background: var(--telegram); color: #fff; }
 
-        .partner-btn-gold { width: 100%; background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); padding: 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .partner-btn-gold { width: 100%; background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); padding: 12px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
         .partner-btn-gold:active { transform: scale(0.98); }
 
         /* RESULTS */
         .results-box { background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .res-value-main { font-size: 32px; font-weight: 800; color: #fff; margin: 10px 0; letter-spacing: 1px; }
+        .res-value-main { font-size: 28px; font-weight: 800; color: #fff; margin: 10px 0; letter-spacing: 1px; }
         .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; text-align: left; }
         .res-item-small { font-size: 11px; color: var(--text-sec); }
         .res-val-small { font-size: 14px; font-weight: 700; color: #fff; }
@@ -91,7 +96,7 @@
         .text-red { color: var(--danger); }
         .text-gold { color: var(--accent); }
 
-        /* COMMON & TOOLS */
+        /* COMMON */
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -104,10 +109,11 @@
         .cta-btn { background: linear-gradient(90deg, var(--accent), #f0e68c); color: #000; width: 90%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); text-decoration: none; display: block; text-align: center; text-transform: uppercase; margin: 25px auto 10px auto; }
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
+        .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; font-family: monospace; }
         .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; }
         
         .info-icon { background: rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 14px; height: 14px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; margin-left: 5px; }
-        .info-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; font-size: 13px; color: #ccc; margin-bottom: 20px; border-left: 4px solid var(--accent); line-height: 1.5; }
+        .info-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 12px; color: #ccc; margin-top: 10px; border-left: 3px solid var(--accent); }
 
         /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
@@ -115,19 +121,23 @@
         .modal-title { color: var(--accent); font-size: 18px; font-weight: bold; margin-bottom: 10px; }
         .modal-text { color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
         .modal-btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+
+        /* HIDDEN PDF */
+        #pdf-container { position: absolute; top: -9999px; left: -9999px; width: 600px; background: #fff; color: #000; padding: 40px; font-family: Helvetica, sans-serif; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <img src="1000072083.jpg" alt="SELECTA ITALIA" class="logo-img">
+        <div id="user-welcome" class="user-welcome">Ciao Investitore! 👋</div>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="openTab('pac')">PAC</button>
         <button class="tab-btn" onclick="openTab('rendita')">Rendita</button>
         <button class="tab-btn" onclick="openTab('tools')">Tools 🛠️</button>
-        <button class="tab-btn" onclick="openTab('confronto')">Confronto</button>
+        <button class="tab-btn" onclick="openTab('confronto')">Report</button>
     </div>
 
     <div id="pac" class="tab-content active">
@@ -146,12 +156,6 @@
                 <div class="step-btn" onclick="changeVal('pac-initial', 500)">+</div>
             </div>
             <div class="stepper-container">
-                <div class="step-btn" onclick="changeVal('pac-fees', -50)">-</div>
-                <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" readonly></div>
-                <div class="step-btn" onclick="changeVal('pac-fees', 50)">+</div>
-            </div>
-
-            <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-monthly', -50)">-</div>
                 <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-monthly', 50)">+</div>
@@ -165,6 +169,11 @@
                 <div class="step-btn" onclick="changeVal('pac-rate', -0.5)">-</div>
                 <div class="step-display"><span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span><input type="number" id="pac-rate" value="8" step="0.5" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-rate', 0.5)">+</div>
+            </div>
+            <div class="stepper-container">
+                <div class="step-btn" onclick="changeVal('pac-fees', -50)">-</div>
+                <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" readonly></div>
+                <div class="step-btn" onclick="changeVal('pac-fees', 50)">+</div>
             </div>
 
             <div class="switch-container">
@@ -231,7 +240,7 @@
                     <div><div class="res-item-small">Cash Incassato</div><div class="res-val-small text-green" id="res-ren-total-cash">€ 0</div></div>
                 </div>
                 <div class="res-grid" style="margin-top:10px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
-                    <div><div class="res-item-small">Capitale Versato</div><div class="res-val-small" id="res-ren-invested-disp">€ 0</div></div>
+                    <div><div class="res-item-small">Capitale Iniziale</div><div class="res-val-small" id="res-ren-invested-disp">€ 0</div></div>
                     <div><div class="res-item-small">ROI Totale</div><div class="res-val-small text-gold" id="res-ren-roi">0%</div></div>
                 </div>
                 
@@ -245,13 +254,11 @@
     </div>
 
     <div id="tools" class="tab-content">
-        <div class="info-box" style="border-left-color: #00e676;">
-            <strong style="color:#fff; font-size:16px;">⏳ Macchina del Tempo</strong><br><br>
-            Se avessi investito 1.000€ nel 2014:<br>
-            • in <strong>S&P 500</strong>, oggi avresti circa <strong>3.200€</strong>.<br>
-            • in <strong>Bitcoin</strong>, oggi avresti oltre <strong>120.000€</strong>.<br>
-            • in <strong>Oro</strong>, oggi avresti circa <strong>1.900€</strong>.<br><br>
-            <em style="font-size:11px; color:#aaa;">Il momento migliore per investire era ieri. Il secondo migliore è oggi.</em>
+        <div class="info-box" style="margin-bottom:20px; border-left: 3px solid #00e676;">
+            <strong style="color:#fff; font-size:14px;">⏳ Macchina del Tempo</strong><br>
+            Se avessi investito 1.000€ nel 2014 in <strong>S&P 500</strong>, oggi avresti circa <strong>3.200€</strong>.
+            Se li avessi messi in <strong>Bitcoin</strong>, oggi avresti oltre <strong>120.000€</strong>.<br>
+            <em style="font-size:10px; color:#888;">Il momento migliore per piantare un albero era 20 anni fa. Il secondo migliore è oggi.</em>
         </div>
 
         <div class="card">
@@ -304,13 +311,14 @@
                 <div class="res-item-small">VINCITORE</div>
                 <div id="comp-winner-text" style="font-size:18px; font-weight:800; color:var(--success); margin-top:5px;">---</div>
             </div>
+            <button class="partner-btn-gold" style="background:#fff; color:#000; margin-top:20px;" onclick="generatePDF()">📥 Scarica Report PDF (Pro)</button>
         </div>
     </div>
 
     <hr>
     <a href="https://t.me/selectaitalia" class="cta-btn">💎 Canale @selectaitalia</a>
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.0 Clean</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.0 Monthly</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -318,10 +326,32 @@
             <button class="modal-btn" onclick="closeInfo()">Chiudi</button>
         </div>
     </div>
+    
+    <div id="pdf-container">
+        <h2 style="border-bottom:2px solid #d4af37; padding-bottom:10px;">SELECTA ITALIA - Report</h2>
+        <p>Report generato per: <b id="pdf-user">Investitore</b></p>
+        
+        <h3>Strategia PAC</h3>
+        <p>Versamento: <b id="pdf-monthly"></b> | Durata: <b id="pdf-years"></b></p>
+        <p>Capitale Finale: <b id="pdf-total" style="font-size:20px;"></b></p>
+        <p>Guadagno Netto: <b id="pdf-gain"></b></p>
+        
+        <h3>Strategia Rendita</h3>
+        <p>Ricchezza Totale: <b id="pdf-ren-total"></b></p>
+        
+        <h3 style="background:#eee; padding:5px;">STRATEGIA VINCITRICE: <span id="pdf-winner"></span></h3>
+        
+        <div style="margin-top:50px; font-size:10px; color:#666;">Documento a scopo informativo.</div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+
+        // INIT USERNAME
+        const user = tg.initDataUnsafe?.user;
+        const firstName = user ? user.first_name : "Investitore";
+        document.getElementById('user-welcome').innerText = `Ciao ${firstName}! 👋`;
 
         let pacChart = null; let renChart = null;
         let pacMode = 'line'; let renMode = 'line';
@@ -363,6 +393,8 @@
         }
 
         // --- LOGIC ---
+        let lastMilestone = 0; // Per evitare spam coriandoli
+
         function calculatePAC() {
             let P = parseFloat(document.getElementById('pac-initial').value) || 0;
             let PMT = parseFloat(document.getElementById('pac-monthly').value) || 0;
@@ -383,7 +415,11 @@
                 currentTotal = (currentTotal + PMT) * (1 + monthlyRate);
                 currentInvested += PMT;
                 if(crashMode && i === crashMonth) currentTotal = currentTotal * 0.65; // -35%
-                if(i % 12 === 0) { labels.push(`A${i/12}`); dataTot.push(currentTotal); dataInv.push(currentInvested); }
+                
+                // --- MODIFICA: PUSH OGNI MESE ---
+                labels.push(i); 
+                dataTot.push(currentTotal); 
+                dataInv.push(currentInvested); 
             }
 
             let grossFinal = currentTotal;
@@ -393,6 +429,11 @@
             document.getElementById('res-pac-gross').innerText = fmt.format(grossFinal);
             document.getElementById('res-pac-invested').innerText = fmt.format(currentInvested);
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
+
+            // ANIMAZIONE CORIANDOLI
+            if(grossFinal >= 100000 && lastMilestone < 100000) { confetti({particleCount: 100, spread: 70, origin: { y: 0.6 }}); lastMilestone = 100000; }
+            else if(grossFinal >= 500000 && lastMilestone < 500000) { confetti({particleCount: 150, spread: 90}); lastMilestone = 500000; }
+            else if(grossFinal < 100000) lastMilestone = 0; 
 
             if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Versato', 'Guadagno'], [currentInvested, gainTotal], ['#004d40', '#00e676']);
             else updateChart('pacChart', 'line', labels, dataTot, dataInv, ['#00e676', '#004d40']);
@@ -405,14 +446,23 @@
             let Rent = parseFloat(document.getElementById('ren-monthly').value)||0;
             let years = parseFloat(document.getElementById('ren-years').value)||1;
             
+            let months = years * 12;
             let cash = Rent * 12 * years; 
             let total = Asset + cash; 
             
-            // ROI CALCULATION
-            let roi = 0;
-            if (Invested > 0) {
-                roi = ((total - Invested) / Invested) * 100;
+            let labels = [];
+            let dataTotal = [];
+            
+            // --- MODIFICA: LOOP MENSILE ANCHE PER RENDITA ---
+            let runningCash = 0;
+            for(let i=1; i<=months; i++){
+                runningCash += Rent;
+                labels.push(i);
+                dataTotal.push(Asset + runningCash);
             }
+
+            let roi = 0;
+            if (Invested > 0) roi = ((total - Invested) / Invested) * 100;
 
             document.getElementById('res-ren-total-val').innerText = fmt.format(total);
             document.getElementById('res-ren-final-asset').innerText = fmt.format(Asset);
@@ -421,7 +471,7 @@
             document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
             
             if (renMode === 'pie') updateChart('renChart', 'pie', ['Asset', 'Cash'], [Asset, cash], ['#8a701e', '#d4af37']);
-            else updateChart('renChart', 'line', ['Start', 'End'], [Asset, total], null, ['#d4af37']);
+            else updateChart('renChart', 'line', labels, dataTotal, null, ['#d4af37']);
             updateComparison();
         }
 
@@ -460,6 +510,20 @@
             if(crashMode) { btn.classList.add('active'); btn.innerText = "⚠️ CROLLO ATTIVO (-35%)"; }
             else { btn.classList.remove('active'); btn.innerText = "💥 Simula Crollo Mercati (-35%)"; }
             calculatePAC();
+        }
+
+        function generatePDF() {
+            triggerHaptic();
+            document.getElementById('pdf-user').innerText = firstName;
+            document.getElementById('pdf-monthly').innerText = document.getElementById('pac-monthly').value + '€';
+            document.getElementById('pdf-years').innerText = document.getElementById('pac-years').value + ' Anni';
+            document.getElementById('pdf-total').innerText = document.getElementById('res-pac-gross').innerText;
+            document.getElementById('pdf-gain').innerText = document.getElementById('res-pac-gain').innerText;
+            document.getElementById('pdf-ren-total').innerText = document.getElementById('res-ren-total-val').innerText;
+            document.getElementById('pdf-winner').innerText = document.getElementById('comp-winner-text').innerText;
+            
+            let opt = { margin:10, filename:`Selecta_Report_${firstName}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+            html2pdf().set(opt).from(document.getElementById('pdf-container')).save();
         }
         
         function updateComparison() {
@@ -500,26 +564,7 @@
         }
         function closeInfo() { document.getElementById('infoModal').style.display = 'none'; }
 
-        // INIT & LOAD
-        const saved = JSON.parse(localStorage.getItem('selectaData_v5'));
-        if(saved) for(const [k,v] of Object.entries(saved)) { const el=document.getElementById(k); if(el) el.type==='checkbox'?el.checked=v:el.value=v; }
-        
-        function saveData() {
-            const inputs = document.querySelectorAll('input, select');
-            let data = {};
-            inputs.forEach(el => { if(el.id) { if(el.type === 'checkbox') data[el.id] = el.checked; else data[el.id] = el.value; } });
-            localStorage.setItem('selectaData_v5', JSON.stringify(data));
-        }
-        // Auto-save on change
-        document.querySelectorAll('input, select').forEach(el => el.addEventListener('change', saveData));
-
-        function clearData() {
-            if(confirm('Vuoi resettare i dati?')) {
-                localStorage.removeItem('selectaData_v5');
-                location.reload();
-            }
-        }
-
+        // INIT
         calculatePAC(); calculateRen(); calcWaste(); calcFire();
     </script>
 </body>

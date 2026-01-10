@@ -28,9 +28,6 @@
             --danger: #ff5252;
             --warning: #ffab00;
             --telegram: #229ED9;
-            /* Nuovi colori grafici */
-            --chart-green: #00e676;
-            --chart-blue: #1565c0;
         }
 
         body {
@@ -47,7 +44,6 @@
         .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; margin-top: 10px; }
         .logo-img { width: 140px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); margin-bottom: 10px; }
 
-        /* TABS */
         .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto; }
         .tab-btn { flex: 1; padding: 10px 5px; border: none; background: transparent; color: var(--text-sec); font-weight: 600; font-size: 11px; cursor: pointer; border-radius: 8px; transition: all 0.3s; white-space: nowrap; }
         .tab-btn.active { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(212,175,55,0.4); }
@@ -55,17 +51,14 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* CARDS */
         .card { background-color: var(--bg-card); border-radius: 20px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin-bottom: 25px; border: 1px solid rgba(212, 175, 55, 0.15); position: relative; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
 
-        /* CHART CONTROLS */
         .chart-controls { display: flex; gap: 5px; }
         .chart-btn { background: rgba(255,255,255,0.1); border: none; color: var(--text-sec); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .chart-btn.active { background: var(--accent); color: #000; }
 
-        /* STEPPER */
         .stepper-container { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 5px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .step-btn { background: linear-gradient(145deg, #222, #111); border: 1px solid var(--accent-dim); color: var(--accent); width: 45px; height: 45px; border-radius: 10px; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.1s; }
         .step-btn:active { transform: scale(0.9); background: var(--accent); color: #000; }
@@ -73,7 +66,6 @@
         .step-display input { background: transparent; border: none; color: #fff; text-align: center; font-size: 18px; font-weight: 700; width: 100%; outline: none; -moz-appearance: textfield; }
         .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
 
-        /* PULSANTI ACTION */
         .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
         .crash-btn { width: 100%; background: rgba(255, 82, 82, 0.1); border: 1px solid var(--danger); color: #ff8a80; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; }
         .crash-btn.active { background: var(--danger); color: #fff; }
@@ -82,7 +74,6 @@
         .partner-btn-gold { width: 100%; background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); padding: 12px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
         .partner-btn-gold:active { transform: scale(0.98); }
 
-        /* RESULTS */
         .results-box { background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
         .res-value-main { font-size: 28px; font-weight: 800; color: #fff; margin: 10px 0; letter-spacing: 1px; }
         .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; text-align: left; }
@@ -92,7 +83,6 @@
         .text-red { color: var(--danger); }
         .text-gold { color: var(--accent); }
 
-        /* COMMON */
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -106,12 +96,10 @@
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
         .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; font-family: monospace; }
-        .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; }
         
         .info-icon { background: rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 14px; height: 14px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; margin-left: 5px; }
         .info-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 12px; color: #ccc; margin-top: 10px; border-left: 3px solid var(--accent); }
 
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
         .modal-content { background: var(--bg-card); border: 1px solid var(--accent); border-radius: 15px; padding: 25px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .modal-title { color: var(--accent); font-size: 18px; font-weight: bold; margin-bottom: 10px; }
@@ -129,7 +117,7 @@
         <button class="tab-btn active" onclick="openTab('pac')">PAC</button>
         <button class="tab-btn" onclick="openTab('rendita')">Rendita</button>
         <button class="tab-btn" onclick="openTab('tools')">Tools 🛠️</button>
-        <button class="tab-btn" onclick="openTab('confronto')">Confronto</button>
+        <button class="tab-btn" onclick="openTab('confronto')">Report</button>
     </div>
 
     <div id="pac" class="tab-content active">
@@ -147,13 +135,11 @@
                 <div class="step-display"><span class="step-label">Capitale Iniziale (€)</span><input type="number" id="pac-initial" value="5000" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-initial', 500)">+</div>
             </div>
-            
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-fees', -50)">-</div>
                 <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-fees', 50)">+</div>
             </div>
-
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-monthly', -50)">-</div>
                 <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculatePAC()" readonly></div>
@@ -224,6 +210,11 @@
                 <div class="step-btn" onclick="changeVal('ren-years', -1)">-</div>
                 <div class="step-display"><span class="step-label">Anni Proiezione</span><input type="number" id="ren-years" value="15" onchange="calculateRen()" readonly></div>
                 <div class="step-btn" onclick="changeVal('ren-years', 1)">+</div>
+            </div>
+
+            <div class="switch-container">
+                <div style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:5px;">Calcola Inflazione <span class="info-icon" onclick="showInfo('inflation')">i</span></div>
+                <label class="switch"><input type="checkbox" id="ren-inflation" onchange="calculateRen()"><span class="slider"></span></label>
             </div>
             
             <div class="results-box">
@@ -311,7 +302,7 @@
     <hr>
     <a href="https://t.me/selectaitalia" class="cta-btn">💎 Canale @selectaitalia</a>
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.2 Final</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.3 Final</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -329,7 +320,6 @@
         let crashMode = false;
         const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-        // --- HAPTICS & UI ---
         function triggerHaptic() { if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); }
 
         function changeVal(id, amount) {
@@ -384,8 +374,6 @@
                 currentTotal = (currentTotal + PMT) * (1 + monthlyRate);
                 currentInvested += PMT;
                 if(crashMode && i === crashMonth) currentTotal = currentTotal * 0.65; // -35%
-                
-                // PUSH OGNI MESE (GRAFICO FLUIDO)
                 labels.push(i); 
                 dataTot.push(currentTotal); 
                 dataInv.push(currentInvested); 
@@ -399,8 +387,8 @@
             document.getElementById('res-pac-invested').innerText = fmt.format(currentInvested);
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
 
-            // COLORI VERDE (#00e676) E BLU SCURO (#1565c0)
-            if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Capitale', 'Guadagno'], [currentInvested, gainTotal], ['#1565c0', '#00e676']);
+            // COLORI: Blue (#1565c0) e Green (#00e676)
+            if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Capitale', 'Guadagno'], [currentInvested, gainTotal], null, ['#1565c0', '#00e676']);
             else updateChart('pacChart', 'line', labels, dataTot, dataInv, ['#00e676', '#1565c0']);
             updateComparison();
         }
@@ -410,15 +398,18 @@
             let Invested = parseFloat(document.getElementById('ren-invested').value)||0;
             let Rent = parseFloat(document.getElementById('ren-monthly').value)||0;
             let years = parseFloat(document.getElementById('ren-years').value)||1;
+            let useInflation = document.getElementById('ren-inflation').checked;
             
             let months = years * 12;
             let cash = Rent * 12 * years; 
             let total = Asset + cash; 
             
+            // Inflazione in Rendita
+            if(useInflation) total = total / Math.pow(1.02, years);
+
             let labels = [];
             let dataTotal = [];
             
-            // LOOP MENSILE (GRAFICO FLUIDO)
             let runningCash = 0;
             for(let i=1; i<=months; i++){
                 runningCash += Rent;
@@ -435,13 +426,11 @@
             document.getElementById('res-ren-invested-disp').innerText = fmt.format(Invested);
             document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
             
-            // COLORI VERDE E BLU SCURO
-            if (renMode === 'pie') updateChart('renChart', 'pie', ['Asset', 'Cash'], [Asset, cash], ['#1565c0', '#00e676']);
+            if (renMode === 'pie') updateChart('renChart', 'pie', ['Asset', 'Cash'], [Asset, cash], null, ['#1565c0', '#00e676']);
             else updateChart('renChart', 'line', labels, dataTotal, null, ['#00e676']);
             updateComparison();
         }
 
-        // --- NEW TOOLS LOGIC ---
         function changeFire(amount) {
             triggerHaptic();
             let inp = document.getElementById('fire-expenses');
@@ -450,9 +439,9 @@
         }
         function calcFire() {
             let exp = parseFloat(document.getElementById('fire-expenses').value) || 0;
-            let target = exp * 12 * 25; // 4% rule
+            let target = exp * 12 * 25; 
             let useInf = document.getElementById('fire-inflation').checked;
-            if(useInf) target = target * Math.pow(1.02, 20); // Inflazione su 20 anni stima
+            if(useInf) target = target * Math.pow(1.02, 20); 
             document.getElementById('fire-target').innerText = fmt.format(target);
         }
         function changeWaste(amount) {
@@ -497,9 +486,11 @@
             if(mode === 'line') {
                 config = { type: 'line', data: { labels: labels, datasets: [ { data: data1, borderColor: colors[0], backgroundColor: colors[0]+'33', fill: true, tension: 0.3, pointRadius: 0 }, ...(data2 ? [{ data: data2, borderColor: colors[1], borderDash:[5,5], pointRadius:0, borderWidth:1 }] : []) ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x:{display:false}, y:{display:false} }, interaction: { intersect: false, mode: 'index' } } };
             } else {
-                let val1 = data2 ? data2[data2.length-1] : data1[0]; 
-                let val2 = data1[data1.length-1] - val1;
-                config = { type: 'doughnut', data: { labels: ['Capitale', 'Guadagno'], datasets: [{ data: [val1, val2], backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
+                // FIX PIE CHART
+                // Pie chart expects data in the first dataset array
+                let val1 = data1[0]; 
+                let val2 = data1[1];
+                config = { type: 'doughnut', data: { labels: labels, datasets: [{ data: data1, backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
             }
             let newChart = new Chart(ctx, config);
             if(id === 'pacChart') pacChart = newChart; else renChart = newChart;

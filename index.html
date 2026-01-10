@@ -7,14 +7,13 @@
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-42QMLWNCQ1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-42QMLWNCQ1', { 'debug_mode': true });
+      gtag('config', 'G-42QMLWNCQ1');
     </script>
 
     <style>
@@ -29,8 +28,6 @@
             --danger: #ff5252;
             --warning: #ffab00;
             --telegram: #229ED9;
-            --chart-base: #4a5568; /* Grigio per il capitale */
-            --chart-gain: #00e676; /* Verde per il profitto */
         }
 
         body {
@@ -42,15 +39,10 @@
             -webkit-tap-highlight-color: transparent;
             padding-bottom: 80px;
             user-select: none;
-            opacity: 0;
-            transition: opacity 0.5s ease;
         }
-        
-        body.loaded { opacity: 1; }
 
-        /* HEADER */
-        .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; margin-top: 10px; }
-        .logo-img { width: 140px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); margin-bottom: 10px; }
+        .header { display: flex; justify-content: center; margin-bottom: 20px; margin-top: 10px; }
+        .logo-img { width: 140px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); }
 
         /* TABS */
         .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto; }
@@ -65,46 +57,33 @@
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
 
-        /* CHART CONTROLS */
         .chart-controls { display: flex; gap: 5px; }
         .chart-btn { background: rgba(255,255,255,0.1); border: none; color: var(--text-sec); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; }
         .chart-btn.active { background: var(--accent); color: #000; }
 
-        /* STEPPER & INPUTS */
-        .stepper-container { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 5px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        /* STEPPER */
+        .stepper-container { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 5px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
         .step-btn { background: linear-gradient(145deg, #222, #111); border: 1px solid var(--accent-dim); color: var(--accent); width: 45px; height: 45px; border-radius: 10px; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.1s; }
         .step-btn:active { transform: scale(0.9); background: var(--accent); color: #000; }
-        
-        .step-display { flex: 1; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; position: relative; }
-        
-        .step-display input { 
-            background: transparent; border: 1px solid transparent; color: #fff; 
-            text-align: center; font-size: 18px; font-weight: 700; width: 100%; 
-            outline: none; -moz-appearance: textfield; border-radius: 6px;
-            transition: background 0.2s, border 0.2s; padding: 2px;
-        }
-        .step-display input:focus { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; pointer-events: none; }
-        .step-sublabel { font-size: 9px; color: var(--success); margin-top: 2px; font-weight: normal; }
+        .step-display { flex: 1; text-align: center; font-family: 'Roboto Mono', monospace; font-size: 18px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; }
+        .step-display input { background: transparent; border: none; color: #fff; text-align: center; font-size: 18px; font-weight: 700; width: 100%; outline: none; -moz-appearance: textfield; }
+        .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
 
-        /* DNA BADGE */
-        .dna-badge { background: rgba(212, 175, 55, 0.2); border: 1px solid var(--accent); color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+        /* PULSANTI ACTION */
+        .action-group { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+        
+        .crash-btn { width: 100%; background: rgba(255, 82, 82, 0.1); border: 1px solid var(--danger); color: #ff8a80; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; box-sizing: border-box; }
+        .crash-btn.active { background: var(--danger); color: #fff; }
 
-        /* ACTION BUTTONS */
-        .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-        .action-btn { width: 100%; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; border: none; transition: transform 0.1s; text-decoration: none; }
-        .action-btn:active { transform: scale(0.98); }
-        .btn-red { background: rgba(255, 82, 82, 0.15); border: 1px solid var(--danger); color: #ff8a80; }
-        .btn-red.active { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(255, 82, 82, 0.4); }
-        .btn-blue { background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); color: var(--telegram); }
-        .btn-blue:hover { background: var(--telegram); color: #fff; }
-        .btn-gold { background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .btn-gold:hover { background: var(--accent); color: #000; }
+        .share-btn { width: 100%; background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); color: var(--telegram); padding: 12px; border-radius: 10px; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-sizing: border-box; }
+        .share-btn:hover { background: var(--telegram); color: #fff; }
+
+        .partner-btn-gold { width: 100%; background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); padding: 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .partner-btn-gold:active { transform: scale(0.98); }
 
         /* RESULTS */
         .results-box { background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .res-value-main { font-size: 28px; font-weight: 800; color: #fff; margin: 10px 0; letter-spacing: 1px; }
+        .res-value-main { font-size: 32px; font-weight: 800; color: #fff; margin: 10px 0; letter-spacing: 1px; }
         .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; text-align: left; }
         .res-item-small { font-size: 11px; color: var(--text-sec); }
         .res-val-small { font-size: 14px; font-weight: 700; color: #fff; }
@@ -112,7 +91,7 @@
         .text-red { color: var(--danger); }
         .text-gold { color: var(--accent); }
 
-        /* SWITCHES */
+        /* COMMON & TOOLS */
         .switch-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
         .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -122,16 +101,13 @@
         input:checked + .slider:before { transform: translateX(16px); }
 
         .chart-wrapper { position: relative; height: 220px; width: 100%; margin-top:20px; }
+        .cta-btn { background: linear-gradient(90deg, var(--accent), #f0e68c); color: #000; width: 90%; max-width: 350px; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3); text-decoration: none; display: block; text-align: center; text-transform: uppercase; margin: 25px auto 10px auto; }
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
+        .tax-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 2px 5px; font-size: 12px; margin-left: 5px; }
         
         .info-icon { background: rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 14px; height: 14px; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; margin-left: 5px; }
-        .info-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; font-size: 12px; color: #ccc; margin-top: 10px; border-left: 3px solid var(--accent); }
-
-        /* CTA BTN */
-        .cta-btn { display: flex; justify-content: center; align-items: center; width: 100%; padding: 16px; margin: 20px 0; background-color: var(--telegram); color: white; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; box-shadow: 0 5px 15px rgba(34, 158, 217, 0.4); transition: transform 0.2s, opacity 0.2s; box-sizing: border-box; text-transform: uppercase; letter-spacing: 0.5px; }
-        .cta-btn:hover { opacity: 0.9; }
-        .cta-btn:active { transform: scale(0.98); }
+        .info-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; font-size: 13px; color: #ccc; margin-bottom: 20px; border-left: 4px solid var(--accent); line-height: 1.5; }
 
         /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
@@ -150,8 +126,8 @@
     <div class="tabs">
         <button class="tab-btn active" onclick="openTab('pac')">PAC</button>
         <button class="tab-btn" onclick="openTab('rendita')">Rendita</button>
-        <button class="tab-btn" onclick="openTab('tools')">Strumenti</button>
-        <button class="tab-btn" onclick="openTab('confronto')">Riepilogo</button>
+        <button class="tab-btn" onclick="openTab('tools')">Tools 🛠️</button>
+        <button class="tab-btn" onclick="openTab('confronto')">Confronto</button>
     </div>
 
     <div id="pac" class="tab-content active">
@@ -166,39 +142,29 @@
             
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-initial', -500)">-</div>
-                <div class="step-display"><span class="step-label">Capitale Iniziale (€)</span><input type="number" id="pac-initial" value="5000" onchange="calculatePAC()" inputmode="numeric"></div>
+                <div class="step-display"><span class="step-label">Capitale Iniziale (€)</span><input type="number" id="pac-initial" value="5000" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-initial', 500)">+</div>
             </div>
             <div class="stepper-container">
-                <div class="step-btn" onclick="changeVal('pac-monthly', -50)">-</div>
-                <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculatePAC()" inputmode="numeric"></div>
-                <div class="step-btn" onclick="changeVal('pac-monthly', 50)">+</div>
-            </div>
-
-            <div class="stepper-container" style="border: 1px solid rgba(255,82,82,0.3); background: rgba(255,82,82,0.05);">
-                <div class="step-btn" onclick="changeVal('pac-withdrawal', -50)" style="color:#ff8a80; border-color:#ff8a80;">-</div>
-                <div class="step-display">
-                    <span class="step-label" style="color:#ff8a80;">Prelievo Mensile (Lordo)</span>
-                    <input type="number" id="pac-withdrawal" value="0" onchange="calculatePAC()" inputmode="numeric">
-                    <span id="pac-withdrawal-net" class="step-sublabel">Netto: € 0</span>
-                </div>
-                <div class="step-btn" onclick="changeVal('pac-withdrawal', 50)" style="color:#ff8a80; border-color:#ff8a80;">+</div>
+                <div class="step-btn" onclick="changeVal('pac-fees', -50)">-</div>
+                <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" readonly></div>
+                <div class="step-btn" onclick="changeVal('pac-fees', 50)">+</div>
             </div>
 
             <div class="stepper-container">
+                <div class="step-btn" onclick="changeVal('pac-monthly', -50)">-</div>
+                <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculatePAC()" readonly></div>
+                <div class="step-btn" onclick="changeVal('pac-monthly', 50)">+</div>
+            </div>
+            <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-years', -1)">-</div>
-                <div class="step-display"><span class="step-label">Durata (Anni)</span><input type="number" id="pac-years" value="15" onchange="calculatePAC()" inputmode="numeric"></div>
+                <div class="step-display"><span class="step-label">Durata (Anni)</span><input type="number" id="pac-years" value="15" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-years', 1)">+</div>
             </div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-rate', -0.5)">-</div>
-                <div class="step-display"><span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span><input type="number" id="pac-rate" value="8" step="0.5" onchange="calculatePAC()" inputmode="decimal"></div>
+                <div class="step-display"><span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span><input type="number" id="pac-rate" value="8" step="0.5" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-rate', 0.5)">+</div>
-            </div>
-             <div class="stepper-container">
-                <div class="step-btn" onclick="changeVal('pac-fees', -50)">-</div>
-                <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" inputmode="numeric"></div>
-                <div class="step-btn" onclick="changeVal('pac-fees', 50)">+</div>
             </div>
 
             <div class="switch-container">
@@ -210,17 +176,15 @@
                 <div style="font-size:11px; color:var(--text-sec); letter-spacing:1px;">MONTANTE FINALE LORDO</div>
                 <div class="res-value-main"><span id="res-pac-gross">€ 0</span></div>
                 
-                <div id="pac-dna" class="dna-badge">---</div>
-
                 <div class="res-grid" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
                     <div><div class="res-item-small">Versato</div><div class="res-val-small" id="res-pac-invested">€ 0</div></div>
                     <div><div class="res-item-small">Guadagno</div><div class="res-val-small text-green" id="res-pac-gain">€ 0</div></div>
                 </div>
 
                 <div class="action-group">
-                    <button class="action-btn btn-red" id="btn-crash" onclick="toggleCrash()">💥 Simula Crollo Mercati (-35%)</button>
-                    <button class="action-btn btn-blue" onclick="shareTelegram('pac')">✈️ Condividi Analisi</button>
-                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="action-btn btn-gold" onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_pac'});">⚡ Inizia PAC su <strong>Trade Republic</strong></a>
+                    <div class="crash-btn" id="btn-crash" onclick="toggleCrash()">💥 Simula Crollo Mercati (-35%)</div>
+                    <div class="share-btn" onclick="shareTelegram('pac')">✈️ Condividi Analisi</div>
+                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold" onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_pac'});">⚡ Inizia PAC su <strong>Trade Republic</strong></a>
                 </div>
             </div>
 
@@ -240,51 +204,23 @@
             
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-asset-val', -5000)">-</div>
-                <div class="step-display"><span class="step-label">Valore Asset (€)</span><input type="number" id="ren-asset-val" value="200000" onchange="calculateRen()" inputmode="numeric"></div>
+                <div class="step-display"><span class="step-label">Valore Asset (€)</span><input type="number" id="ren-asset-val" value="200000" onchange="calculateRen()" readonly></div>
                 <div class="step-btn" onclick="changeVal('ren-asset-val', 5000)">+</div>
             </div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-invested', -5000)">-</div>
-                <div class="step-display"><span class="step-label">Capitale Versato (€)</span><input type="number" id="ren-invested" value="150000" onchange="calculateRen()" inputmode="numeric"></div>
+                <div class="step-display"><span class="step-label">Capitale Versato (€)</span><input type="number" id="ren-invested" value="150000" onchange="calculateRen()" readonly></div>
                 <div class="step-btn" onclick="changeVal('ren-invested', 5000)">+</div>
             </div>
-
-            <div class="stepper-container">
-                <div class="step-btn" onclick="changeRenYield(-0.5)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Rendimento Affitto/Div. (%)</span>
-                    <input type="number" id="ren-yield" value="4.8" onchange="updateRenFromYield()" inputmode="decimal">
-                </div>
-                <div class="step-btn" onclick="changeRenYield(0.5)">+</div>
-            </div>
-
-            <div class="stepper-container">
-                <div class="step-btn" onclick="changeRenAppr(-0.5)">-</div>
-                <div class="step-display">
-                    <span class="step-label">Rivalutazione Asset Annua (%)</span>
-                    <input type="number" id="ren-appreciation" value="2" step="0.5" onchange="calculateRen()" inputmode="decimal">
-                </div>
-                <div class="step-btn" onclick="changeRenAppr(0.5)">+</div>
-            </div>
-
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-monthly', -50)">-</div>
-                <div class="step-display"><span class="step-label">Entrata Mensile (€)</span><input type="number" id="ren-monthly" value="800" onchange="calculateRen()" inputmode="numeric"></div>
+                <div class="step-display"><span class="step-label">Rendita Mensile (€)</span><input type="number" id="ren-monthly" value="800" onchange="calculateRen()" readonly></div>
                 <div class="step-btn" onclick="changeVal('ren-monthly', 50)">+</div>
             </div>
              <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('ren-years', -1)">-</div>
-                <div class="step-display"><span class="step-label">Anni Proiezione</span><input type="number" id="ren-years" value="15" onchange="calculateRen()" inputmode="numeric"></div>
+                <div class="step-display"><span class="step-label">Anni Proiezione</span><input type="number" id="ren-years" value="15" onchange="calculateRen()" readonly></div>
                 <div class="step-btn" onclick="changeVal('ren-years', 1)">+</div>
-            </div>
-
-            <div class="switch-container">
-                <div style="font-size:12px; color:#aaa;">Calcola Inflazione (2%)</div>
-                <label class="switch"><input type="checkbox" id="ren-inflation" onchange="calculateRen()"><span class="slider"></span></label>
-            </div>
-            <div class="switch-container" style="border-top:none; margin-top:0;">
-                <div style="font-size:12px; color:#aaa;">Tasse (21%)</div>
-                <label class="switch"><input type="checkbox" id="ren-tax" onchange="calculateRen()"><span class="slider"></span></label>
             </div>
             
             <div class="results-box">
@@ -295,13 +231,13 @@
                     <div><div class="res-item-small">Cash Incassato</div><div class="res-val-small text-green" id="res-ren-total-cash">€ 0</div></div>
                 </div>
                 <div class="res-grid" style="margin-top:10px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
-                    <div><div class="res-item-small">Capitale Iniziale</div><div class="res-val-small" id="res-ren-invested-disp">€ 0</div></div>
+                    <div><div class="res-item-small">Capitale Versato</div><div class="res-val-small" id="res-ren-invested-disp">€ 0</div></div>
                     <div><div class="res-item-small">ROI Totale</div><div class="res-val-small text-gold" id="res-ren-roi">0%</div></div>
                 </div>
                 
                 <div class="action-group">
-                    <button class="action-btn btn-blue" onclick="shareTelegram('ren')">✈️ Condividi Analisi</button>
-                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="action-btn btn-gold" onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_ren'});">⚡ Ottieni 3.75% su <strong>Trade Republic</strong></a>
+                    <div class="share-btn" onclick="shareTelegram('ren')">✈️ Condividi Analisi</div>
+                    <a href="https://refnocode.trade.re/pcbrl1pv" target="_blank" class="partner-btn-gold" onclick="gtag('event', 'click_referral', {'event_category': 'monetization', 'event_label': 'trade_republic_ren'});">⚡ Ottieni 3.75% su <strong>Trade Republic</strong></a>
                 </div>
             </div>
             <div class="chart-wrapper"><canvas id="renChart"></canvas></div>
@@ -309,11 +245,13 @@
     </div>
 
     <div id="tools" class="tab-content">
-        <div class="info-box" style="margin-bottom:20px; border-left: 3px solid #00e676;">
-            <strong style="color:#fff; font-size:14px;">⏳ Macchina del Tempo</strong><br>
-            Se avessi investito 1.000€ nel 2014 in <strong>S&P 500</strong>, oggi avresti circa <strong>3.200€</strong>.
-            Se li avessi messi in <strong>Bitcoin</strong>, oggi avresti oltre <strong>120.000€</strong>.<br>
-            <em style="font-size:10px; color:#888;">Il momento migliore per piantare un albero era 20 anni fa. Il secondo migliore è oggi.</em>
+        <div class="info-box" style="border-left-color: #00e676;">
+            <strong style="color:#fff; font-size:16px;">⏳ Macchina del Tempo</strong><br><br>
+            Se avessi investito 1.000€ nel 2014:<br>
+            • in <strong>S&P 500</strong>, oggi avresti circa <strong>3.200€</strong>.<br>
+            • in <strong>Bitcoin</strong>, oggi avresti oltre <strong>120.000€</strong>.<br>
+            • in <strong>Oro</strong>, oggi avresti circa <strong>1.900€</strong>.<br><br>
+            <em style="font-size:11px; color:#aaa;">Il momento migliore per investire era ieri. Il secondo migliore è oggi.</em>
         </div>
 
         <div class="card">
@@ -322,7 +260,7 @@
             
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeFire(-50)">-</div>
-                <div class="step-display"><span class="step-label">Spese Mensili (€)</span><input type="number" id="fire-expenses" value="1500" onchange="calcFire()" inputmode="numeric"></div>
+                <div class="step-display"><span class="step-label">Spese Mensili (€)</span><input type="number" id="fire-expenses" value="1500" readonly></div>
                 <div class="step-btn" onclick="changeFire(50)">+</div>
             </div>
             
@@ -341,7 +279,7 @@
             <div class="card-title">☕ Sprechi vs Investimenti</div>
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeWaste(-0.5)">-</div>
-                <div class="step-display"><span class="step-label">Spreco Giornaliero (€)</span><input type="number" id="waste-daily" value="3.5" onchange="calcWaste()" inputmode="decimal"></div>
+                <div class="step-display"><span class="step-label">Spreco Giornaliero (€)</span><input type="number" id="waste-daily" value="3.5" readonly></div>
                 <div class="step-btn" onclick="changeWaste(0.5)">+</div>
             </div>
             <div class="res-grid">
@@ -353,7 +291,7 @@
 
     <div id="confronto" class="tab-content">
         <div class="card">
-            <div class="card-title" style="margin-bottom:20px; text-align:center;">Riepilogo Finale</div>
+            <div class="card-title" style="margin-bottom:20px; text-align:center;">Analisi Finale</div>
             <div class="comp-box" style="border-left:4px solid #00e676; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px; margin-bottom:10px;">
                 <div style="font-size:12px; color:#aaa;">Strategia PAC</div>
                 <div style="font-size:20px; font-weight:bold; color:#fff;" id="comp-pac-end">€ 0</div>
@@ -369,14 +307,10 @@
         </div>
     </div>
 
-    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin: 30px 0;">
-    
-    <a href="https://t.me/SelectaItalia" class="cta-btn" target="_blank">
-        💎 Unisciti al Canale @SelectaItalia
-    </a>
-    
+    <hr>
+    <a href="https://t.me/selectaitalia" class="cta-btn">💎 Canale @selectaitalia</a>
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v4.8 Polish</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.0 Clean</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -388,16 +322,14 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        
-        window.addEventListener('load', () => { document.body.classList.add('loaded'); });
 
         let pacChart = null; let renChart = null;
         let pacMode = 'line'; let renMode = 'line';
         let crashMode = false;
         const fmt = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
-        const chartColors = ['#4a5568', '#00e676']; // Standard Colors: Grey, Green
 
-        function triggerHaptic() { if(tg.HapticFeedback) tg.HapticFeedback.selectionChanged(); }
+        // --- HAPTICS & UI ---
+        function triggerHaptic() { if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); }
 
         function changeVal(id, amount) {
             triggerHaptic();
@@ -431,20 +363,14 @@
         }
 
         // --- LOGIC ---
-        let lastMilestone = 0; 
-
         function calculatePAC() {
             let P = parseFloat(document.getElementById('pac-initial').value) || 0;
             let PMT = parseFloat(document.getElementById('pac-monthly').value) || 0;
-            let withdrawal = parseFloat(document.getElementById('pac-withdrawal').value) || 0;
             let years = parseFloat(document.getElementById('pac-years').value) || 1;
             let rate = (parseFloat(document.getElementById('pac-rate').value) || 0) / 100;
             let costs = parseFloat(document.getElementById('pac-fees').value) || 0;
             let useInflation = document.getElementById('pac-inflation').checked;
             
-            let netWith = withdrawal * 0.74; 
-            document.getElementById('pac-withdrawal-net').innerText = "Netto in tasca: " + fmt.format(netWith);
-
             let months = years * 12;
             let monthlyRate = rate / 12;
             let currentTotal = P - costs;
@@ -454,18 +380,10 @@
             let crashMonth = Math.floor(months / 2);
 
             for(let i=1; i<=months; i++){
-                currentTotal = currentTotal * (1 + monthlyRate);
-                currentTotal += PMT;
+                currentTotal = (currentTotal + PMT) * (1 + monthlyRate);
                 currentInvested += PMT;
-                currentTotal -= withdrawal;
-                if(currentTotal < 0) currentTotal = 0;
-
-                if(crashMode && i === crashMonth) currentTotal = currentTotal * 0.65; 
-                
-                // PUSH DATA EVERY MONTH FOR SMOOTH LINE
-                labels.push(''); // No label per month to avoid clutter
-                dataTot.push(currentTotal);
-                dataInv.push(currentInvested);
+                if(crashMode && i === crashMonth) currentTotal = currentTotal * 0.65; // -35%
+                if(i % 12 === 0) { labels.push(`A${i/12}`); dataTot.push(currentTotal); dataInv.push(currentInvested); }
             }
 
             let grossFinal = currentTotal;
@@ -476,129 +394,57 @@
             document.getElementById('res-pac-invested').innerText = fmt.format(currentInvested);
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
 
-            let dna = "🐢 Tartaruga Saggia";
-            if(rate >= 0.08) dna = "🎯 Cecchino";
-            if(rate >= 0.12 || crashMode) dna = "🐺 Lupo di Wall Street";
-            document.getElementById('pac-dna').innerText = dna;
-
-            if(grossFinal >= 100000 && lastMilestone < 100000) { confetti({particleCount: 100, spread: 70, origin: { y: 0.6 }}); lastMilestone = 100000; }
-            else if(grossFinal < 100000) lastMilestone = 0; 
-
-            let chartLabels = pacMode === 'pie' ? ['Capitale Proprio', 'Profitto Totale'] : labels;
-            let chartData1 = pacMode === 'pie' ? [currentInvested, gainTotal] : dataTot;
-            let chartData2 = pacMode === 'pie' ? null : dataInv;
-            
-            updateChart('pacChart', pacMode, chartLabels, chartData1, chartData2, chartColors);
+            if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Versato', 'Guadagno'], [currentInvested, gainTotal], ['#004d40', '#00e676']);
+            else updateChart('pacChart', 'line', labels, dataTot, dataInv, ['#00e676', '#004d40']);
             updateComparison();
         }
 
-        // --- REN LOGIC ---
-
-        function changeRenYield(amount) {
-            triggerHaptic();
-            const input = document.getElementById('ren-yield');
-            let val = parseFloat(input.value) || 0;
-            let newVal = val + amount;
-            if(newVal < 0) newVal = 0;
-            input.value = newVal.toFixed(1);
-            updateRenFromYield();
-        }
-        
-        function changeRenAppr(amount) {
-            triggerHaptic();
-            const input = document.getElementById('ren-appreciation');
-            let val = parseFloat(input.value) || 0;
-            let newVal = val + amount;
-            input.value = newVal.toFixed(1);
-            calculateRen();
-        }
-
-        function updateRenFromYield() {
-            let Asset = parseFloat(document.getElementById('ren-asset-val').value)||0;
-            let Yield = parseFloat(document.getElementById('ren-yield').value)||0;
-            let monthly = (Asset * (Yield / 100)) / 12;
-            document.getElementById('ren-monthly').value = monthly.toFixed(0);
-            calculateRen(true); 
-        }
-
-        function calculateRen(skipYieldUpdate = false) {
+        function calculateRen() {
             let Asset = parseFloat(document.getElementById('ren-asset-val').value)||0;
             let Invested = parseFloat(document.getElementById('ren-invested').value)||0;
             let Rent = parseFloat(document.getElementById('ren-monthly').value)||0;
             let years = parseFloat(document.getElementById('ren-years').value)||1;
-            let appreciation = parseFloat(document.getElementById('ren-appreciation').value)||0; // NEW
-            let useInflation = document.getElementById('ren-inflation').checked;
-            let useTax = document.getElementById('ren-tax').checked;
-
-            if(!skipYieldUpdate && Asset > 0) {
-                 let yearlyRent = Rent * 12;
-                 let calcYield = (yearlyRent / Asset) * 100;
-                 document.getElementById('ren-yield').value = calcYield.toFixed(1);
-            }
-
-            // CALCOLO LINEA TEMPORALE PER GRAFICO
-            let labels = []; let dataTot = []; let dataInv = [];
-            let months = years * 12;
             
-            let currentAsset = Asset;
-            let currentCash = 0;
-            let monthlyAppreciationRate = appreciation / 100 / 12;
-
-            for(let i=1; i<=months; i++) {
-                // Rivalutazione Asset
-                currentAsset = currentAsset * (1 + monthlyAppreciationRate);
-                
-                // Incasso Affitto
-                let monthlyRent = Rent;
-                if(useTax) monthlyRent = monthlyRent * 0.79;
-                currentCash += monthlyRent;
-
-                labels.push('');
-                dataTot.push(currentAsset + currentCash);
-                dataInv.push(Invested); // Linea piatta del capitale versato
-            }
-
-            let finalAsset = currentAsset;
-            let totalCash = currentCash;
-            let total = finalAsset + totalCash;
-
-            // INFLAZIONE SU TOTALE FINALE
-            if(useInflation) {
-                total = total / Math.pow(1.02, years);
-                let factor = 1 / Math.pow(1.02, years);
-                finalAsset = finalAsset * factor;
-                totalCash = totalCash * factor;
-            }
+            let cash = Rent * 12 * years; 
+            let total = Asset + cash; 
             
+            // ROI CALCULATION
             let roi = 0;
-            if (Invested > 0) roi = ((total - Invested) / Invested) * 100;
+            if (Invested > 0) {
+                roi = ((total - Invested) / Invested) * 100;
+            }
 
             document.getElementById('res-ren-total-val').innerText = fmt.format(total);
-            document.getElementById('res-ren-final-asset').innerText = fmt.format(finalAsset);
-            document.getElementById('res-ren-total-cash').innerText = fmt.format(totalCash);
+            document.getElementById('res-ren-final-asset').innerText = fmt.format(Asset);
+            document.getElementById('res-ren-total-cash').innerText = fmt.format(cash);
             document.getElementById('res-ren-invested-disp').innerText = fmt.format(Invested);
             document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
             
-            let chartLabels = renMode === 'pie' ? ['Capitale Proprio', 'Profitto Totale'] : labels;
-            
-            // Pie chart logic: Invested vs Profit
-            let profit = total - Invested;
-            let chartData1 = renMode === 'pie' ? [Invested, profit] : dataTot;
-            let chartData2 = renMode === 'pie' ? null : dataInv;
-
-            updateChart('renChart', renMode, chartLabels, chartData1, chartData2, chartColors);
+            if (renMode === 'pie') updateChart('renChart', 'pie', ['Asset', 'Cash'], [Asset, cash], ['#8a701e', '#d4af37']);
+            else updateChart('renChart', 'line', ['Start', 'End'], [Asset, total], null, ['#d4af37']);
             updateComparison();
         }
 
-        function changeFire(amount) { triggerHaptic(); let inp = document.getElementById('fire-expenses'); inp.value = (parseFloat(inp.value)||0) + amount; calcFire(); }
+        // --- NEW TOOLS LOGIC ---
+        function changeFire(amount) {
+            triggerHaptic();
+            let inp = document.getElementById('fire-expenses');
+            inp.value = (parseFloat(inp.value)||0) + amount;
+            calcFire();
+        }
         function calcFire() {
             let exp = parseFloat(document.getElementById('fire-expenses').value) || 0;
-            let target = exp * 12 * 25; 
+            let target = exp * 12 * 25; // 4% rule
             let useInf = document.getElementById('fire-inflation').checked;
-            if(useInf) target = target * Math.pow(1.02, 20); 
+            if(useInf) target = target * Math.pow(1.02, 20); // Inflazione su 20 anni stima
             document.getElementById('fire-target').innerText = fmt.format(target);
         }
-        function changeWaste(amount) { triggerHaptic(); let inp = document.getElementById('waste-daily'); inp.value = (parseFloat(inp.value)||0) + amount; calcWaste(); }
+        function changeWaste(amount) {
+            triggerHaptic();
+            let inp = document.getElementById('waste-daily');
+            inp.value = (parseFloat(inp.value)||0) + amount;
+            calcWaste();
+        }
         function calcWaste() {
             let daily = parseFloat(document.getElementById('waste-daily').value) || 0;
             let burned = daily * 365 * 20;
@@ -631,67 +477,13 @@
             let instance = (id === 'pacChart') ? pacChart : renChart;
             if(instance) instance.destroy();
 
-            // Unified Gradient
-            let bg1 = colors[1]; // Green default for Pie
-            if(mode === 'line') {
-                let gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                gradient.addColorStop(0, colors[1] + '66'); 
-                gradient.addColorStop(1, colors[1] + '00'); 
-                bg1 = gradient;
-            }
-
             let config;
             if(mode === 'line') {
-                config = { 
-                    type: 'line', 
-                    data: { 
-                        labels: labels, 
-                        datasets: [ 
-                            { 
-                                data: data1, // Total Value
-                                borderColor: colors[1], // Green
-                                backgroundColor: bg1, 
-                                fill: true, 
-                                tension: 0.3, 
-                                pointRadius: 0,
-                                borderWidth: 2
-                            }, 
-                            ...(data2 ? [{ 
-                                data: data2, // Invested
-                                borderColor: colors[0], // Grey
-                                borderDash: [5,5], 
-                                pointRadius: 0, 
-                                borderWidth: 1,
-                                fill: false
-                            }] : []) 
-                        ] 
-                    }, 
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        plugins: { legend: { display: false } }, 
-                        scales: { x:{display:false}, y:{display:false} }, 
-                        interaction: { intersect: false, mode: 'index' } 
-                    } 
-                };
+                config = { type: 'line', data: { labels: labels, datasets: [ { data: data1, borderColor: colors[0], backgroundColor: colors[0]+'33', fill: true, tension: 0.3, pointRadius: 0 }, ...(data2 ? [{ data: data2, borderColor: '#fff', borderDash:[5,5], pointRadius:0, borderWidth:1 }] : []) ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x:{display:false}, y:{display:false} }, interaction: { intersect: false, mode: 'index' } } };
             } else {
-                // Pie: Data[0] = Invested (Grey), Data[1] = Profit (Green)
-                config = { 
-                    type: 'doughnut', 
-                    data: { 
-                        labels: labels, 
-                        datasets: [{ 
-                            data: data1, 
-                            backgroundColor: colors, // [Grey, Green]
-                            borderWidth: 0 
-                        }] 
-                    }, 
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        plugins: { legend: { position: 'right', labels:{color:'#fff', font:{size:10}} } } 
-                    } 
-                };
+                let val1 = data2 ? data2[data2.length-1] : data1[0]; 
+                let val2 = data1[data1.length-1] - val1;
+                config = { type: 'doughnut', data: { labels: ['Base', 'Gain'], datasets: [{ data: [val1, val2], backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
             }
             let newChart = new Chart(ctx, config);
             if(id === 'pacChart') pacChart = newChart; else renChart = newChart;
@@ -708,25 +500,26 @@
         }
         function closeInfo() { document.getElementById('infoModal').style.display = 'none'; }
 
-        // INIT
-        function clearData() {
-            localStorage.removeItem('selectaData_v4');
-            location.reload();
-        }
-
-        function loadData() {
-            const saved = JSON.parse(localStorage.getItem('selectaData_v4'));
-            if(saved) for(const [k,v] of Object.entries(saved)) { const el=document.getElementById(k); if(el) el.type==='checkbox'?el.checked=v:el.value=v; }
-        }
+        // INIT & LOAD
+        const saved = JSON.parse(localStorage.getItem('selectaData_v5'));
+        if(saved) for(const [k,v] of Object.entries(saved)) { const el=document.getElementById(k); if(el) el.type==='checkbox'?el.checked=v:el.value=v; }
+        
         function saveData() {
             const inputs = document.querySelectorAll('input, select');
             let data = {};
             inputs.forEach(el => { if(el.id) { if(el.type === 'checkbox') data[el.id] = el.checked; else data[el.id] = el.value; } });
-            localStorage.setItem('selectaData_v4', JSON.stringify(data));
+            localStorage.setItem('selectaData_v5', JSON.stringify(data));
         }
-        document.addEventListener('change', saveData);
-        
-        loadData();
+        // Auto-save on change
+        document.querySelectorAll('input, select').forEach(el => el.addEventListener('change', saveData));
+
+        function clearData() {
+            if(confirm('Vuoi resettare i dati?')) {
+                localStorage.removeItem('selectaData_v5');
+                location.reload();
+            }
+        }
+
         calculatePAC(); calculateRen(); calcWaste(); calcFire();
     </script>
 </body>

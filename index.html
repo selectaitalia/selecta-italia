@@ -119,6 +119,7 @@
         input:checked + .slider:before { transform: translateX(16px); }
 
         .chart-wrapper { position: relative; height: 220px; width: 100%; margin-top:20px; }
+        
         .reset-link { display: block; text-align: center; margin-top: 20px; color: #555; font-size: 11px; text-decoration: underline; cursor: pointer; }
         .disclaimer { margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; font-size: 10px; color: #666; text-align: justify; line-height: 1.4; border: 1px solid rgba(255,255,255,0.05); }
         .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; font-family: monospace; }
@@ -249,6 +250,11 @@
                 <div class="step-btn" onclick="changeVal('ren-years', 1)">+</div>
             </div>
             
+            <div class="switch-container">
+                <div style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:5px;">Calcola Inflazione <span class="info-icon" onclick="showInfo('inflation')">i</span></div>
+                <label class="switch"><input type="checkbox" id="ren-inflation" onchange="calculateRen()"><span class="slider"></span></label>
+            </div>
+
             <div class="results-box">
                 <div style="font-size:11px; color:var(--text-sec);">RICCHEZZA TOTALE GENERATA</div>
                 <div class="res-value-main" id="res-ren-total-val">€ 0</div>
@@ -332,9 +338,10 @@
     </div>
 
     <hr>
-    <a href="https://t.me/selectaitalia" class="cta-btn">💎 Canale @selectaitalia</a>
+    <a href="https://t.me/selectaitalia" class="btn-unified partner-btn-gold" style="margin-top:30px; background:linear-gradient(45deg, #222, #333); border:1px solid #d4af37; color:#fff;">💎 Unisciti al Canale @selectaitalia</a>
+    
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.4 Final</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.5 Final</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -422,7 +429,7 @@
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
 
             // COLORI: VERDE (#00e676) + BLU SCURO (#1565c0)
-            if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Capitale', 'Guadagno'], [currentInvested, gainTotal], null, ['#1565c0', '#00e676']);
+            if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Capitale', 'Guadagno'], [currentInvested, gainTotal], ['#1565c0', '#00e676']);
             else updateChart('pacChart', 'line', labels, dataTot, dataInv, ['#00e676', '#1565c0']);
             updateComparison();
         }
@@ -433,6 +440,7 @@
             let Rent = parseFloat(document.getElementById('ren-monthly').value)||0;
             let years = parseFloat(document.getElementById('ren-years').value)||1;
             let growth = (parseFloat(document.getElementById('ren-growth').value)||0) / 100;
+            let useInflation = document.getElementById('ren-inflation').checked; // INFLAZIONE LEGGERE
             
             let months = years * 12;
             let currentAsset = Asset;
@@ -443,13 +451,17 @@
             let dataTotal = [];
             
             for(let i=1; i<=months; i++){
-                currentAsset = currentAsset * (1 + monthlyGrowth); // Asset cresce
-                cashTotal += Rent; // Affitto accumulato
+                currentAsset = currentAsset * (1 + monthlyGrowth); 
+                cashTotal += Rent; 
                 labels.push(i);
                 dataTotal.push(currentAsset + cashTotal);
             }
 
             let total = currentAsset + cashTotal;
+            
+            // APPLICA INFLAZIONE SU TOTALE
+            if(useInflation) total = total / Math.pow(1.02, years);
+
             let roi = 0;
             if (Invested > 0) roi = ((total - Invested) / Invested) * 100;
 
@@ -459,9 +471,12 @@
             document.getElementById('res-ren-invested-disp').innerText = fmt.format(Invested);
             document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
             
-            // PIE CHART: Capitale Investito (Asset Iniziale/Investito) vs Guadagno (Rendita + Rivalutazione)
+            // PIE CHART FIX
             let totalGain = total - Invested;
-            if (renMode === 'pie') updateChart('renChart', 'pie', ['Capitale Versato', 'Guadagno Totale'], [Invested, totalGain], null, ['#1565c0', '#00e676']);
+            // Se totale < investito (es. inflazione alta), gain è 0 per il grafico
+            if(totalGain < 0) totalGain = 0; 
+
+            if (renMode === 'pie') updateChart('renChart', 'pie', ['Capitale Versato', 'Guadagno Totale'], [Invested, totalGain], ['#1565c0', '#00e676']);
             else updateChart('renChart', 'line', labels, dataTotal, null, ['#00e676']);
             updateComparison();
         }
@@ -522,9 +537,9 @@
             if(mode === 'line') {
                 config = { type: 'line', data: { labels: labels, datasets: [ { data: data1, borderColor: colors[0], backgroundColor: colors[0]+'33', fill: true, tension: 0.3, pointRadius: 0 }, ...(data2 ? [{ data: data2, borderColor: colors[1], borderDash:[5,5], pointRadius:0, borderWidth:1 }] : []) ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x:{display:false}, y:{display:false} }, interaction: { intersect: false, mode: 'index' } } };
             } else {
-                // Fix Pie Chart Data - Use passed data1 directly
-                let finalData = data1; 
-                config = { type: 'doughnut', data: { labels: labels, datasets: [{ data: finalData, backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
+                // DATA FIX FOR PIE: Use passed data directly (data1=array of 2 values)
+                let pieData = data1; 
+                config = { type: 'doughnut', data: { labels: labels, datasets: [{ data: pieData, backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
             }
             let newChart = new Chart(ctx, config);
             if(id === 'pacChart') pacChart = newChart; else renChart = newChart;

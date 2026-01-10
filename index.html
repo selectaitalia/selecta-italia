@@ -7,15 +7,13 @@
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-42QMLWNCQ1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-42QMLWNCQ1', { 'debug_mode': true });
+      gtag('config', 'G-42QMLWNCQ1');
     </script>
 
     <style>
@@ -30,6 +28,9 @@
             --danger: #ff5252;
             --warning: #ffab00;
             --telegram: #229ED9;
+            /* Nuovi colori grafici */
+            --chart-green: #00e676;
+            --chart-blue: #1565c0;
         }
 
         body {
@@ -43,10 +44,8 @@
             user-select: none;
         }
 
-        /* HEADER & USERNAME */
         .header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; margin-top: 10px; }
         .logo-img { width: 140px; height: auto; display: block; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3)); margin-bottom: 10px; }
-        .user-welcome { font-size: 18px; font-weight: bold; color: var(--accent); text-align: center; }
 
         /* TABS */
         .tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); overflow-x: auto; }
@@ -74,15 +73,12 @@
         .step-display input { background: transparent; border: none; color: #fff; text-align: center; font-size: 18px; font-weight: 700; width: 100%; outline: none; -moz-appearance: textfield; }
         .step-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
 
-        /* PULSANTI ACTION (Linearità) */
+        /* PULSANTI ACTION */
         .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-        
         .crash-btn { width: 100%; background: rgba(255, 82, 82, 0.1); border: 1px solid var(--danger); color: #ff8a80; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; }
         .crash-btn.active { background: var(--danger); color: #fff; }
-
         .share-btn { width: 100%; background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); color: var(--telegram); padding: 10px; border-radius: 10px; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s; box-sizing: border-box; }
         .share-btn:hover { background: var(--telegram); color: #fff; }
-
         .partner-btn-gold { width: 100%; background: linear-gradient(45deg, #111, #222); border: 1px solid var(--accent); color: var(--accent); padding: 12px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
         .partner-btn-gold:active { transform: scale(0.98); }
 
@@ -121,23 +117,19 @@
         .modal-title { color: var(--accent); font-size: 18px; font-weight: bold; margin-bottom: 10px; }
         .modal-text { color: #ddd; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
         .modal-btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
-
-        /* HIDDEN PDF */
-        #pdf-container { position: absolute; top: -9999px; left: -9999px; width: 600px; background: #fff; color: #000; padding: 40px; font-family: Helvetica, sans-serif; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <img src="1000072083.jpg" alt="SELECTA ITALIA" class="logo-img">
-        <div id="user-welcome" class="user-welcome">Ciao Investitore! 👋</div>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="openTab('pac')">PAC</button>
         <button class="tab-btn" onclick="openTab('rendita')">Rendita</button>
         <button class="tab-btn" onclick="openTab('tools')">Tools 🛠️</button>
-        <button class="tab-btn" onclick="openTab('confronto')">Report</button>
+        <button class="tab-btn" onclick="openTab('confronto')">Confronto</button>
     </div>
 
     <div id="pac" class="tab-content active">
@@ -155,6 +147,13 @@
                 <div class="step-display"><span class="step-label">Capitale Iniziale (€)</span><input type="number" id="pac-initial" value="5000" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-initial', 500)">+</div>
             </div>
+            
+            <div class="stepper-container">
+                <div class="step-btn" onclick="changeVal('pac-fees', -50)">-</div>
+                <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" readonly></div>
+                <div class="step-btn" onclick="changeVal('pac-fees', 50)">+</div>
+            </div>
+
             <div class="stepper-container">
                 <div class="step-btn" onclick="changeVal('pac-monthly', -50)">-</div>
                 <div class="step-display"><span class="step-label">Versamento Mensile (€)</span><input type="number" id="pac-monthly" value="400" onchange="calculatePAC()" readonly></div>
@@ -169,11 +168,6 @@
                 <div class="step-btn" onclick="changeVal('pac-rate', -0.5)">-</div>
                 <div class="step-display"><span class="step-label">Rendimento (%) <span class="info-icon" onclick="showInfo('rate')">i</span></span><input type="number" id="pac-rate" value="8" step="0.5" onchange="calculatePAC()" readonly></div>
                 <div class="step-btn" onclick="changeVal('pac-rate', 0.5)">+</div>
-            </div>
-            <div class="stepper-container">
-                <div class="step-btn" onclick="changeVal('pac-fees', -50)">-</div>
-                <div class="step-display"><span class="step-label">Costi d'Ingresso (€)</span><input type="number" id="pac-fees" value="0" onchange="calculatePAC()" readonly></div>
-                <div class="step-btn" onclick="changeVal('pac-fees', 50)">+</div>
             </div>
 
             <div class="switch-container">
@@ -240,7 +234,7 @@
                     <div><div class="res-item-small">Cash Incassato</div><div class="res-val-small text-green" id="res-ren-total-cash">€ 0</div></div>
                 </div>
                 <div class="res-grid" style="margin-top:10px; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
-                    <div><div class="res-item-small">Capitale Iniziale</div><div class="res-val-small" id="res-ren-invested-disp">€ 0</div></div>
+                    <div><div class="res-item-small">Capitale Versato</div><div class="res-val-small" id="res-ren-invested-disp">€ 0</div></div>
                     <div><div class="res-item-small">ROI Totale</div><div class="res-val-small text-gold" id="res-ren-roi">0%</div></div>
                 </div>
                 
@@ -311,14 +305,13 @@
                 <div class="res-item-small">VINCITORE</div>
                 <div id="comp-winner-text" style="font-size:18px; font-weight:800; color:var(--success); margin-top:5px;">---</div>
             </div>
-            <button class="partner-btn-gold" style="background:#fff; color:#000; margin-top:20px;" onclick="generatePDF()">📥 Scarica Report PDF (Pro)</button>
         </div>
     </div>
 
     <hr>
     <a href="https://t.me/selectaitalia" class="cta-btn">💎 Canale @selectaitalia</a>
     <div class="reset-link" onclick="clearData()">⚠️ Reset Dati</div>
-    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.0 Monthly</div>
+    <div class="disclaimer"><strong>DISCLAIMER:</strong> Calcoli indicativi. Non costituiscono consulenza finanziaria.<br>© Selecta Italia - v5.2 Final</div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content">
@@ -326,32 +319,10 @@
             <button class="modal-btn" onclick="closeInfo()">Chiudi</button>
         </div>
     </div>
-    
-    <div id="pdf-container">
-        <h2 style="border-bottom:2px solid #d4af37; padding-bottom:10px;">SELECTA ITALIA - Report</h2>
-        <p>Report generato per: <b id="pdf-user">Investitore</b></p>
-        
-        <h3>Strategia PAC</h3>
-        <p>Versamento: <b id="pdf-monthly"></b> | Durata: <b id="pdf-years"></b></p>
-        <p>Capitale Finale: <b id="pdf-total" style="font-size:20px;"></b></p>
-        <p>Guadagno Netto: <b id="pdf-gain"></b></p>
-        
-        <h3>Strategia Rendita</h3>
-        <p>Ricchezza Totale: <b id="pdf-ren-total"></b></p>
-        
-        <h3 style="background:#eee; padding:5px;">STRATEGIA VINCITRICE: <span id="pdf-winner"></span></h3>
-        
-        <div style="margin-top:50px; font-size:10px; color:#666;">Documento a scopo informativo.</div>
-    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
-        // INIT USERNAME
-        const user = tg.initDataUnsafe?.user;
-        const firstName = user ? user.first_name : "Investitore";
-        document.getElementById('user-welcome').innerText = `Ciao ${firstName}! 👋`;
 
         let pacChart = null; let renChart = null;
         let pacMode = 'line'; let renMode = 'line';
@@ -393,8 +364,6 @@
         }
 
         // --- LOGIC ---
-        let lastMilestone = 0; // Per evitare spam coriandoli
-
         function calculatePAC() {
             let P = parseFloat(document.getElementById('pac-initial').value) || 0;
             let PMT = parseFloat(document.getElementById('pac-monthly').value) || 0;
@@ -416,7 +385,7 @@
                 currentInvested += PMT;
                 if(crashMode && i === crashMonth) currentTotal = currentTotal * 0.65; // -35%
                 
-                // --- MODIFICA: PUSH OGNI MESE ---
+                // PUSH OGNI MESE (GRAFICO FLUIDO)
                 labels.push(i); 
                 dataTot.push(currentTotal); 
                 dataInv.push(currentInvested); 
@@ -430,13 +399,9 @@
             document.getElementById('res-pac-invested').innerText = fmt.format(currentInvested);
             document.getElementById('res-pac-gain').innerText = fmt.format(gainTotal);
 
-            // ANIMAZIONE CORIANDOLI
-            if(grossFinal >= 100000 && lastMilestone < 100000) { confetti({particleCount: 100, spread: 70, origin: { y: 0.6 }}); lastMilestone = 100000; }
-            else if(grossFinal >= 500000 && lastMilestone < 500000) { confetti({particleCount: 150, spread: 90}); lastMilestone = 500000; }
-            else if(grossFinal < 100000) lastMilestone = 0; 
-
-            if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Versato', 'Guadagno'], [currentInvested, gainTotal], ['#004d40', '#00e676']);
-            else updateChart('pacChart', 'line', labels, dataTot, dataInv, ['#00e676', '#004d40']);
+            // COLORI VERDE (#00e676) E BLU SCURO (#1565c0)
+            if (pacMode === 'pie') updateChart('pacChart', 'pie', ['Capitale', 'Guadagno'], [currentInvested, gainTotal], ['#1565c0', '#00e676']);
+            else updateChart('pacChart', 'line', labels, dataTot, dataInv, ['#00e676', '#1565c0']);
             updateComparison();
         }
 
@@ -453,7 +418,7 @@
             let labels = [];
             let dataTotal = [];
             
-            // --- MODIFICA: LOOP MENSILE ANCHE PER RENDITA ---
+            // LOOP MENSILE (GRAFICO FLUIDO)
             let runningCash = 0;
             for(let i=1; i<=months; i++){
                 runningCash += Rent;
@@ -470,8 +435,9 @@
             document.getElementById('res-ren-invested-disp').innerText = fmt.format(Invested);
             document.getElementById('res-ren-roi').innerText = roi.toFixed(1) + "%";
             
-            if (renMode === 'pie') updateChart('renChart', 'pie', ['Asset', 'Cash'], [Asset, cash], ['#8a701e', '#d4af37']);
-            else updateChart('renChart', 'line', labels, dataTotal, null, ['#d4af37']);
+            // COLORI VERDE E BLU SCURO
+            if (renMode === 'pie') updateChart('renChart', 'pie', ['Asset', 'Cash'], [Asset, cash], ['#1565c0', '#00e676']);
+            else updateChart('renChart', 'line', labels, dataTotal, null, ['#00e676']);
             updateComparison();
         }
 
@@ -511,20 +477,6 @@
             else { btn.classList.remove('active'); btn.innerText = "💥 Simula Crollo Mercati (-35%)"; }
             calculatePAC();
         }
-
-        function generatePDF() {
-            triggerHaptic();
-            document.getElementById('pdf-user').innerText = firstName;
-            document.getElementById('pdf-monthly').innerText = document.getElementById('pac-monthly').value + '€';
-            document.getElementById('pdf-years').innerText = document.getElementById('pac-years').value + ' Anni';
-            document.getElementById('pdf-total').innerText = document.getElementById('res-pac-gross').innerText;
-            document.getElementById('pdf-gain').innerText = document.getElementById('res-pac-gain').innerText;
-            document.getElementById('pdf-ren-total').innerText = document.getElementById('res-ren-total-val').innerText;
-            document.getElementById('pdf-winner').innerText = document.getElementById('comp-winner-text').innerText;
-            
-            let opt = { margin:10, filename:`Selecta_Report_${firstName}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
-            html2pdf().set(opt).from(document.getElementById('pdf-container')).save();
-        }
         
         function updateComparison() {
              let pac = document.getElementById('res-pac-gross').innerText;
@@ -543,11 +495,11 @@
 
             let config;
             if(mode === 'line') {
-                config = { type: 'line', data: { labels: labels, datasets: [ { data: data1, borderColor: colors[0], backgroundColor: colors[0]+'33', fill: true, tension: 0.3, pointRadius: 0 }, ...(data2 ? [{ data: data2, borderColor: '#fff', borderDash:[5,5], pointRadius:0, borderWidth:1 }] : []) ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x:{display:false}, y:{display:false} }, interaction: { intersect: false, mode: 'index' } } };
+                config = { type: 'line', data: { labels: labels, datasets: [ { data: data1, borderColor: colors[0], backgroundColor: colors[0]+'33', fill: true, tension: 0.3, pointRadius: 0 }, ...(data2 ? [{ data: data2, borderColor: colors[1], borderDash:[5,5], pointRadius:0, borderWidth:1 }] : []) ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x:{display:false}, y:{display:false} }, interaction: { intersect: false, mode: 'index' } } };
             } else {
                 let val1 = data2 ? data2[data2.length-1] : data1[0]; 
                 let val2 = data1[data1.length-1] - val1;
-                config = { type: 'doughnut', data: { labels: ['Base', 'Gain'], datasets: [{ data: [val1, val2], backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
+                config = { type: 'doughnut', data: { labels: ['Capitale', 'Guadagno'], datasets: [{ data: [val1, val2], backgroundColor: colors, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{color:'#fff'} } } } };
             }
             let newChart = new Chart(ctx, config);
             if(id === 'pacChart') pacChart = newChart; else renChart = newChart;
@@ -564,7 +516,25 @@
         }
         function closeInfo() { document.getElementById('infoModal').style.display = 'none'; }
 
-        // INIT
+        // INIT & LOAD
+        const saved = JSON.parse(localStorage.getItem('selectaData_v5'));
+        if(saved) for(const [k,v] of Object.entries(saved)) { const el=document.getElementById(k); if(el) el.type==='checkbox'?el.checked=v:el.value=v; }
+        
+        function saveData() {
+            const inputs = document.querySelectorAll('input, select');
+            let data = {};
+            inputs.forEach(el => { if(el.id) { if(el.type === 'checkbox') data[el.id] = el.checked; else data[el.id] = el.value; } });
+            localStorage.setItem('selectaData_v5', JSON.stringify(data));
+        }
+        document.querySelectorAll('input, select').forEach(el => el.addEventListener('change', saveData));
+
+        function clearData() {
+            if(confirm('Vuoi resettare i dati?')) {
+                localStorage.removeItem('selectaData_v5');
+                location.reload();
+            }
+        }
+
         calculatePAC(); calculateRen(); calcWaste(); calcFire();
     </script>
 </body>

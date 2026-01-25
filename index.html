@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Selecta">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    <title>Selecta App v17.11</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #050b14; --bg-card: #0f1c2e; --input-bg: rgba(255,255,255,0.03); --gold: #FFD700; --gold-glow: 0 0 12px rgba(255, 215, 0, 0.5); --gold-gradient: linear-gradient(135deg, #FFD700 0%, #E5C100 100%); --silver-gradient: linear-gradient(135deg, #e0e0e0 0%, #909090 100%); --black-gradient: linear-gradient(135deg, #434343 0%, #000000 100%); --platinum-gradient: linear-gradient(135deg, #E6E6FA 0%, #B0C4DE 100%); --diamond-gradient: linear-gradient(135deg, #b9f2ff 0%, #00d2ff 50%, #0078ff 100%); --green: #00FF9D; --red: #FF4D4D; --purple: #9D00FF; --text-main: #ffffff; --text-muted: #94a3b8; --nav-height: 70px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; padding-bottom: calc(var(--nav-height) + 80px); overflow-x: hidden; overscroll-behavior-y: none; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--gold); margin-top: 0; text-shadow: var(--gold-glow); }
+        .card { background: var(--bg-card); border-radius: 16px; padding: 20px; margin: 15px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 25px rgba(0,0,0,0.5); }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: #fff; background: #333; }
+        .status-silver { background: var(--silver-gradient); color: #000; } .status-gold { background: var(--gold-gradient); color: #000; box-shadow: var(--gold-glow); } .status-platinum { background: var(--platinum-gradient); color: #000; } .status-black { background: var(--black-gradient); color: #fff; border: 1px solid #333; } .status-diamond { background: var(--diamond-gradient); color: #fff; box-shadow: 0 0 15px rgba(0, 210, 255, 0.6); }
+        .fire-progress-container { margin-top: 15px; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; position: relative; overflow: hidden; }
+        .fire-progress-bar { height: 100%; background: var(--gold-gradient); width: 0%; transition: width 1s ease-in-out; box-shadow: var(--gold-glow); }
+        .fire-label { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; }
+        .input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .input-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .input-perc { font-size: 0.7rem; color: var(--gold); opacity: 0.8; font-weight: normal; }
+        .input-check { transform: scale(0.8); cursor: pointer; }
+        .input-wrapper { position: relative; margin-bottom: 15px; }
+        .currency-symbol { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gold); font-weight: bold; }
+        input[type="number"], input[type="text"], select { width: 100%; padding: 12px 12px 12px 30px; background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 1rem; font-family: 'Inter', sans-serif; }
+        input:focus { outline: none; border-color: var(--gold); box-shadow: var(--gold-glow); }
+        select { color: #fff; background-color: rgba(255,255,255,0.05); } option { background-color: #111; color: #fff; }
+        .btn-gold { width: 100%; padding: 14px; background: var(--gold-gradient); border: none; border-radius: 8px; color: #050b14; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 10px; box-shadow: var(--gold-glow); }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); box-shadow: none; }
+        .btn-small { padding: 5px 10px; font-size: 0.75rem; width: auto; margin: 0; display: inline-block; cursor: pointer; border: 1px solid var(--gold); border-radius: 4px; color: var(--gold); background: transparent; }
+        .chart-toggle-group { display: flex; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2px; }
+        .chart-toggle-btn { padding: 6px 12px; font-size: 1.1rem; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: 0.3s; }
+        .chart-toggle-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+        .split-layout { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
+        .split-chart { width: 55%; height: 180px; position: relative; }
+        .split-info { width: 45%; text-align: right; display: flex; flex-direction: column; justify-content: center; }
+        .rep-card-body { display: flex; align-items: center; gap: 15px; } .rep-chart-box { width: 40%; height: 130px; position: relative; } .rep-info-box { width: 60%; text-align: right; }
+        .mode-switch { display: flex; background: rgba(0,0,0,0.3); padding: 3px; border-radius: 8px; margin-bottom: 20px; }
+        .mode-opt { flex: 1; text-align: center; padding: 8px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: 0.3s; }
+        .mode-opt.active { background: var(--gold); color: #000; font-weight: bold; }
+        .scenario-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .scen-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 0.7rem; font-weight: bold; color: var(--text-muted); cursor: pointer; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid transparent; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .scen-tab.active { border-color: var(--gold); color: var(--gold); background: rgba(255,215,0,0.1); }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(5,11,20,0.95); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,215,0,0.2); height: 75px; backdrop-filter: blur(10px); padding-top: env(safe-area-inset-top); }
+        .logo-img { height: 50px; width: auto; object-fit: contain; }
+        .privacy-active .censored, .privacy-active input[type="number"] { filter: blur(6px); pointer-events: none; }
+        .leaderboard-box { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .rank-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .rank-pos { font-size: 1.2rem; font-weight: bold; width: 30px; } .rank-1 { color: #FFD700; } .rank-2 { color: #C0C0C0; } .rank-3 { color: #CD7F32; }
+        .rank-name { flex: 1; font-size: 0.9rem; } .rank-val { font-weight: bold; color: var(--green); } .rank-detail { font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 2px; }
+        .history-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .history-del { color: var(--red); cursor: pointer; padding: 5px; }
+        .menu-list { list-style: none; padding: 0; margin: 0; }
+        .menu-item { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+        .menu-content { display: none; padding: 15px; background: rgba(0,0,0,0.2); font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); max-height: 350px; overflow-y: auto; text-align: justify; }
+        .menu-content.open { display: block; }
+        .legal-title { color: #fff; font-weight: bold; margin-bottom: 5px; margin-top: 15px; display: block; }
+        .chart-box-main { height: 250px; position: relative; width: 100%; margin: 15px 0; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; }
+        .res-val { font-size: 1.1rem; font-weight: bold; color: #fff; } .res-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        .sticky-banner { position: fixed; bottom: calc(var(--nav-height) + 15px); left: 50%; transform: translateX(-50%); width: 94%; max-width: 400px; background: linear-gradient(90deg, #0f1c2e 0%, #162a45 100%); border: 1px solid var(--green); padding: 10px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.7); z-index: 999; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: var(--nav-height); background: rgba(5,11,20,0.98); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { text-align: center; color: var(--text-muted); font-size: 0.7rem; width: 20%; cursor: pointer; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { font-size: 1.3rem; margin-bottom: 4px; display: block; transition: transform 0.2s; } .nav-item.active i { transform: translateY(-3px); text-shadow: var(--gold-glow); }
+        .switch-container { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; } .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--gold); } input:checked + .slider:before { transform: translateX(20px); }
+        .text-green { color: var(--green) !important; } .text-red { color: var(--red) !important; } .text-purple { color: var(--purple) !important; }
+        .hidden-file-input { display: none; }
+        .lang-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #aaa; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; margin-left: 5px; }
+        .lang-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(255,215,0,0.1); }
+        .daily-quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.8rem; color: #64748b; text-align: center; margin-top: 25px; padding: 0 10px; opacity: 0.8; line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
+        .tools-nav { display: flex; gap: 10px; padding: 10px 15px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; }
+        .tools-nav::-webkit-scrollbar { display: none; }
+        .tool-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.8rem; cursor: pointer; transition: 0.3s; }
+        .tool-btn.active { background: var(--gold); color: #000; border-color: var(--gold); font-weight: bold; box-shadow: var(--gold-glow); }
+        .tool-card { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .invest-nav { display: flex; margin-bottom: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px; }
+        .invest-btn { flex: 1; text-align: center; padding: 10px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.3s; font-weight: bold; }
+        .invest-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+        .faq-item { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        .faq-q { font-weight: bold; cursor: pointer; color: #fff; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        .faq-a { display: none; color: var(--text-muted); font-size: 0.8rem; margin-top: 8px; line-height: 1.5; text-align: justify; }
+        .faq-q:hover { color: var(--gold); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img src="1000072083.jpg.jpeg" alt="Selecta" class="logo-img" onerror="this.style.display='none'; document.getElementById('txt-logo').style.display='block'">
+            <div id="txt-logo" style="display:none; font-family:'Playfair Display'; font-size:1.2rem; color:var(--gold);">SELECTA</div>
+        </div>
+        <div onclick="togglePrivacy()" style="font-size:1.3rem; color:var(--gold); cursor:pointer;">
+            <i class="fa-solid fa-eye" id="eye-icon"></i>
+        </div>
+    </header>
+
+    <div class="sticky-banner" id="promoBanner">
+        <div>
+            <div style="font-weight:bold; color:#fff;">Trade Republic</div>
+            <div style="font-size:0.75rem; color:var(--green);" data-t="promo_sub">Liquidità 2% + 10€ Bonus Azioni</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <a href="https://ref.trade.re/IL_TUO_LINK" target="_blank" class="btn-small" style="text-decoration:none; background:var(--gold); color:#000; border:none; font-weight:bold;" data-t="btn_redeem">RISCATTA</a>
+            <i class="fa-solid fa-xmark" onclick="document.getElementById('promoBanner').style.display='none'" style="color:var(--text-muted); cursor:pointer;"></i>
+        </div>
+    </div>
+
+    <div id="tab-myselecta" class="tab-content" style="display:block;">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 data-t="h_caveau">Il Caveau</h3>
+                <div class="chart-toggle-group">
+                    <div class="chart-toggle-btn active" id="btn-cav-pie" onclick="setCaveauType('doughnut')"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="chart-toggle-btn" id="btn-cav-line" onclick="setCaveauType('line')"><i class="fa-solid fa-chart-line"></i></div>
+                </div>
+            </div>
+            
+            <div class="split-layout">
+                <div class="split-chart"><canvas id="caveauChart"></canvas></div>
+                <div class="split-info">
+                    <span id="status-badge" class="status-badge">STANDARD</span>
+                    
+                    <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:2px; white-space:nowrap;">
+                        <span style="color:#00FF9D;">A: <span id="lbl-assets" class="censored">€0</span></span> | 
+                        <span style="color:#FF4D4D;">P: <span id="lbl-liabs" class="censored">€0</span></span>
+                    </div>
+
+                    <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;" data-t="lbl_networth">Patrimonio Netto</div>
+                    <div class="censored" id="netWorthDisplay" style="font-size:1.6rem; font-weight:bold; color:#fff; text-shadow:0 0 10px rgba(255,255,255,0.1);">€ 0</div>
+                    <div id="delta-display" class="censored" style="font-size:0.7rem; margin-top:5px; font-weight:bold;"></div>
+                </div>
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <div class="fire-progress-container"><div class="fire-progress-bar" id="fire-bar"></div></div>
+                <div class="fire-label"><span data-t="lbl_fire_prog">Progresso F.I.R.E.</span><span id="fire-perc">0%</span></div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-header"><span class="input-label"><span data-t="lbl_cash">Liquidità</span> <span id="perc-cash" class="input-perc"></span></span><input type="checkbox" class="input-check" id="chk-cash" checked onchange="updateCaveau()"></div>
+                <div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="inp-cash" oninput="updateCaveau()"></div>
+            </div>
+            <div class="input-group">
+                <div class="input-header"><span class="input-label"><span data-t="lbl_invest">Investimenti</span> <span id="perc-invest" class="input-perc"></span></span><input type="checkbox" class="input-check" id="chk-invest" checked onchange="updateCaveau()"></div>
+                <div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="inp-invest" oninput="updateCaveau()"></div>
+            </div>
+            <div class="input-group">
+                <div class="input-header"><span class="input-label">Crypto <span id="perc-crypto" class="input-perc"></span></span><input type="checkbox" class="input-check" id="chk-crypto" checked onchange="updateCaveau()"></div>
+                <div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="inp-crypto" oninput="updateCaveau()"></div>
+            </div>
+            <div class="input-group">
+                <div class="input-header"><span class="input-label"><span data-t="lbl_real">Valore Immobili</span> <span id="perc-real" class="input-perc"></span></span><input type="checkbox" class="input-check" id="chk-real" checked onchange="updateCaveau()"></div>
+                <div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="inp-real" oninput="updateCaveau()"></div>
+            </div>
+            <div class="input-group">
+                <div class="input-header"><span class="input-label" style="color:var(--purple);"><span data-t="lbl_extra">Extra</span> <span id="perc-extra" class="input-perc"></span></span><input type="checkbox" class="input-check" id="chk-extra" checked onchange="updateCaveau()"></div>
+                <div class="input-wrapper"><span class="currency-symbol" style="color:var(--purple)">€</span><input type="number" id="inp-extra" oninput="updateCaveau()"></div>
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.1); margin: 20px 0; padding-top:10px;">
+                <div class="input-header"><span class="input-label" style="color:var(--red);" data-t="lbl_debt">PASSIVITÀ & MUTUI</span><input type="checkbox" class="input-check" id="chk-debt" checked onchange="updateCaveau()"></div>
+                <div class="input-wrapper"><span class="currency-symbol" style="color:var(--red)">€</span><input type="number" id="debt-cap" placeholder="Capitale Residuo" oninput="updateCaveau()"></div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <div style="flex:1"><input type="number" id="debt-rate" placeholder="Tasso %" oninput="updateCaveau()"></div>
+                    <div style="flex:1"><input type="number" id="debt-years" placeholder="Anni" oninput="updateCaveau()"></div>
+                </div>
+                <div style="margin-top:10px; font-size:0.8rem; display:flex; justify-content:space-between; color:var(--text-muted)">
+                    <span><span data-t="lbl_rate">Rata</span>: <span id="debt-rata" class="text-red">€ 0</span></span>
+                    <span><span data-t="lbl_int">Interessi Tot</span>: <span id="debt-int" class="text-red">€ 0</span></span>
+                </div>
+            </div>
+            
+            <button class="btn-gold" onclick="saveHistoryPoint()" data-t="btn_save">Salva Nello Storico</button>
+            <div id="daily-quote" class="daily-quote"></div>
+        </div>
+    </div>
+
+    <div id="tab-invest" class="tab-content" style="display:none;">
+        <div style="padding:0 15px;">
+            <div class="invest-nav">
+                <div class="invest-btn active" id="btn-inv-pac" onclick="showInvest('pac')">PAC</div>
+                <div class="invest-btn" id="btn-inv-ren" onclick="showInvest('ren')">RENDITA</div>
+            </div>
+        </div>
+        <div id="inv-pac" class="tool-card">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;"><h3>PAC Strategist</h3><div class="chart-toggle-group"><div class="chart-toggle-btn" id="btn-pac-pie" onclick="togglePacChartType('doughnut')"><i class="fa-solid fa-chart-pie"></i></div><div class="chart-toggle-btn active" id="btn-pac-line" onclick="togglePacChartType('line')"><i class="fa-solid fa-chart-line"></i></div></div></div>
+                <div class="mode-switch"><div class="mode-opt active" id="mode-proj" onclick="setPacMode('proj')" data-t="mode_proj">Proiezione</div><div class="mode-opt" id="mode-goal" onclick="setPacMode('goal')" data-t="mode_goal">Obiettivo 🎯</div></div>
+                <div style="margin-bottom:10px; display:flex; gap:5px; align-items:center;">
+                    <input type="text" id="pac-name-edit" placeholder="Nome Scenario" oninput="updateScenarioName('PAC')" style="padding:8px; font-size:0.9rem; border-color:transparent; background:transparent; border-bottom:1px solid var(--gold); border-radius:0;">
+                    <i class="fa-solid fa-pen" style="color:var(--gold); font-size:0.8rem;"></i>
+                </div>
+                <div class="scenario-tabs">
+                    <div class="scen-tab active" id="tab-PAC-A" onclick="switchScenario('PAC','A')">PAC A</div>
+                    <div class="scen-tab" id="tab-PAC-B" onclick="switchScenario('PAC','B')">PAC B</div>
+                    <div class="scen-tab" id="tab-PAC-C" onclick="switchScenario('PAC','C')">PAC C</div>
+                </div>
+                <div class="input-group"><label data-t="lbl_init_cap">Capitale Iniziale</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="pac-initial"></div></div>
+                <div id="inp-monthly-box" class="input-group"><label data-t="lbl_monthly">Versamento Mensile</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="pac-monthly"></div></div>
+                <div id="inp-goal-box" class="input-group" style="display:none"><label style="color:var(--gold)" data-t="lbl_goal_cap">Obiettivo Capitale Finale</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="pac-goal"></div></div>
+                <div class="input-group"><label data-t="lbl_years">Durata (Anni)</label><div class="input-wrapper"><input type="number" id="pac-years"></div></div>
+                <div class="input-group"><label data-t="lbl_yield">Rendimento Annuo (%)</label><div class="input-wrapper"><input type="number" id="pac-rate"></div></div>
+                <div class="switch-container"><span style="font-size:0.8rem; color:#aaa;" data-t="lbl_infl">Calcola Inflazione (2%)</span><label class="switch"><input type="checkbox" id="pac-inflation" onchange="calculatePAC()"><span class="slider"></span></label></div>
+                <button class="btn-gold" onclick="calculatePAC()" data-t="btn_calc">Calcola</button>
+                <div class="res-grid"><div><div class="res-label" id="lbl-res-1" data-t="res_invested">Versato</div><div class="res-val censored" id="res-pac-invested">€ 0</div></div><div><div class="res-label" id="lbl-res-2" data-t="res_result">Risultato</div><div class="res-val text-green censored" id="res-pac-total">€ 0</div></div></div>
+                <div class="chart-box-main"><canvas id="pacChart"></canvas></div>
+                <button class="btn-outline btn-gold" onclick="saveReport('pac')" data-t="btn_report">Salva Report</button>
+            </div>
+        </div>
+        <div id="inv-ren" class="tool-card" style="display:none;">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;"><h3>Rendita</h3><div class="chart-toggle-group"><div class="chart-toggle-btn" id="btn-ren-pie" onclick="toggleRenChartType('doughnut')"><i class="fa-solid fa-chart-pie"></i></div><div class="chart-toggle-btn active" id="btn-ren-line" onclick="toggleRenChartType('line')"><i class="fa-solid fa-chart-line"></i></div></div></div>
+                <div style="margin-bottom:10px; display:flex; gap:5px; align-items:center;">
+                    <input type="text" id="ren-name-edit" placeholder="Nome Scenario" oninput="updateScenarioName('REN')" style="padding:8px; font-size:0.9rem; border-color:transparent; background:transparent; border-bottom:1px solid var(--gold); border-radius:0;">
+                    <i class="fa-solid fa-pen" style="color:var(--gold); font-size:0.8rem;"></i>
+                </div>
+                <div class="scenario-tabs"><div class="scen-tab active" id="tab-REN-A" onclick="switchScenario('REN','A')">REN A</div><div class="scen-tab" id="tab-REN-B" onclick="switchScenario('REN','B')">REN B</div><div class="scen-tab" id="tab-REN-C" onclick="switchScenario('REN','C')">REN C</div></div>
+                <div class="input-group"><label data-t="lbl_asset_val">Valore Asset (Totale)</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="ren-asset"></div></div>
+                <div class="input-group"><label data-t="lbl_equity">Capitale Versato (Equity)</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="ren-invested"></div></div>
+                <div class="input-group"><label data-t="lbl_rent">Affitto/Cedola Lorda (Mese)</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="ren-monthly"></div></div>
+                <div class="input-group"><label data-t="lbl_growth">Rivalutazione Asset (%)</label><div class="input-wrapper"><input type="number" id="ren-growth"></div></div>
+                <div class="input-group"><label data-t="lbl_years">Anni Proiezione</label><div class="input-wrapper"><input type="number" id="ren-years"></div></div>
+                <div class="switch-container"><span style="font-size:0.8rem; color:#aaa;" data-t="lbl_infl">Calcola Inflazione (2%)</span><label class="switch"><input type="checkbox" id="ren-inflation" onchange="calculateRen()"><span class="slider"></span></label></div>
+                <button class="btn-gold" onclick="calculateRen()" data-t="btn_calc">Calcola</button>
+                <div class="res-grid"><div><div class="res-label" data-t="res_rent_cash">Rendita Incassata</div><div class="res-val text-green censored" id="res-ren-cash">€ 0</div></div><div><div class="res-label" data-t="res_asset_final">Valore Asset Finale</div><div class="res-val censored" id="res-ren-asset">€ 0</div></div></div>
+                <div class="chart-box-main"><canvas id="renChart"></canvas></div>
+                <button class="btn-outline btn-gold" onclick="saveReport('rent')" data-t="btn_report">Salva Report</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-tools" class="tab-content" style="display:none;">
+        <div class="tools-nav">
+            <button class="tool-btn active" onclick="showTool('tax')" data-t="btn_tool_tax">⚖️ Netto</button>
+            <button class="tool-btn" onclick="showTool('fire')" data-t="btn_tool_fire">🔥 FIRE</button>
+            <button class="tool-btn" onclick="showTool('div')" data-t="btn_tool_div">💸 Divid</button>
+            <button class="tool-btn" onclick="showTool('debt')" data-t="btn_tool_debt">❄️ Debiti</button>
+            <button class="tool-btn" onclick="showTool('opp')" data-t="btn_tool_opp">🔮 Verità</button>
+            <button class="tool-btn" onclick="showTool('back')" data-t="btn_tool_back">⏳ Backtest</button>
+        </div>
+        <div id="tool-tax" class="tool-card"><div class="card"><h3 data-t="h_tax">⚖️ Calcolatore Netto</h3><div class="input-group"><label data-t="lbl_gross">Plusvalenza Lorda</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="tax-gross"></div></div><div class="input-group"><label data-t="lbl_asset_type">Tipo Asset</label><div class="input-wrapper"><select id="tax-type"><option value="0.26">Azioni / ETF / Crypto (26%)</option><option value="0.125">Titoli di Stato (12.5%)</option></select></div></div><div class="switch-container"><span style="font-size:0.8rem; color:#aaa;">Bollo Monti (0.2%)</span><label class="switch"><input type="checkbox" id="tax-stamp"><span class="slider"></span></label></div><div id="tax-cap-wrap" class="input-group" style="display:none; margin-top:10px;"><label data-t="lbl_tot_cap">Capitale Totale</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="tax-cap"></div></div><button class="btn-gold" onclick="calcTax()" data-t="btn_calc_net">Calcola Netto</button><div id="tax-res" style="text-align:center; margin-top:10px; font-weight:bold;"></div></div></div>
+        <div id="tool-fire" class="tool-card" style="display:none"><div class="card"><h3>🔥 F.I.R.E. Calculator</h3><div class="input-group"><label data-t="lbl_fire_exp">Spese Mensili Desiderate</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="fire-exp" value="1500" oninput="calcFire()"></div></div><div class="input-group"><label data-t="lbl_fire_cur">Capitale Attuale</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="fire-cur" value="10000" oninput="calcFire()"></div></div><div class="input-group"><label data-t="lbl_fire_save">Risparmio Mensile</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="fire-save" value="500" oninput="calcFire()"></div></div><div class="input-group" style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;"><div class="input-header"><span class="input-label" style="color:var(--gold);" data-t="lbl_swr">Tasso di Prelievo Sicuro (%)</span></div><div class="input-wrapper"><input type="number" id="fire-swr" value="4" step="0.1" oninput="calcFire()"></div></div><div style="margin-top:20px; text-align:center;"><div id="fire-res" style="font-size:1.5rem; font-weight:bold; color:var(--gold);">...</div><div id="fire-date" style="font-size:1rem; color:var(--green); font-weight:bold; margin-top:5px;"></div><div id="fire-target" style="font-size:0.8rem; color:#fff; margin-top:5px;"></div></div></div></div>
+        <div id="tool-div" class="tool-card" style="display:none"><div class="card"><h3>💸 Dividendometro</h3><div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;" data-t="desc_div">Quanto capitale serve per la tua rendita passiva?</div><div class="input-group"><label data-t="lbl_div_month">Rendita Mensile Desiderata</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="div-monthly" placeholder="es. 500"></div></div><div class="input-group"><label data-t="lbl_div_yield">Rendimento Annuo (%)</label><div class="input-wrapper"><input type="number" id="div-yield" value="4"></div></div><button class="btn-gold" onclick="calcDividend()" data-t="btn_calc_cap">Calcola Capitale</button><div id="div-result" style="display:none; margin-top:15px; text-align:center;"><div style="font-size:0.8rem; color:#aaa;" data-t="res_cap_req">Capitale Necessario</div><div id="div-val" style="font-size:1.8rem; font-weight:bold; color:var(--gold); text-shadow:var(--gold-glow);">€ 0</div></div></div></div>
+        
+        <div id="tool-debt" class="tool-card" style="display:none">
+            <div class="card">
+                <h3>❄️ Distruttore Debiti</h3>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;" data-t="desc_debt">Scopri quanto risparmi pagando un extra ogni mese o se ti conviene investirlo.</div>
+                <div class="input-group"><label data-t="lbl_debt_tot">Debito Totale</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="snow-tot"></div></div>
+                <div class="input-group"><label data-t="lbl_debt_rate">Tasso Annuo (%)</label><div class="input-wrapper"><input type="number" id="snow-rate"></div></div>
+                <div class="input-group"><label data-t="lbl_debt_pay">Rata Attuale</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="snow-pay"></div></div>
+                <div class="input-group"><label style="color:var(--green)" data-t="lbl_debt_extra">Extra Mensile (Pizza in meno)</label><div class="input-wrapper"><span class="currency-symbol" style="color:var(--green)">€</span><input type="number" id="snow-extra"></div></div>
+                
+                <div class="input-group" style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <label style="color:var(--gold)">Rendimento Investimento Alternativo (%)</label>
+                    <div class="input-wrapper"><input type="number" id="snow-invest-rate" placeholder="es. 7"></div>
+                </div>
+
+                <button class="btn-gold" onclick="calcDebtSnowball()" data-t="btn_calc">Calcola Risparmio</button>
+                <div id="snow-result" style="display:none; margin-top:15px;">
+                    <div style="margin-bottom:10px;">⏱️ <span data-t="res_time_saved">Tempo Risparmiato</span>: <b class="text-green" id="snow-time"></b></div>
+                    <div style="margin-bottom:10px;">💰 <span data-t="res_money_saved">Interessi Risparmiati</span>: <b class="text-gold" id="snow-save"></b></div>
+                    <div style="margin-bottom:15px;">📈 <span style="color:var(--text-muted)">Potenziale Investimento:</span> <b class="text-green" id="snow-invest-res"></b></div>
+                    <div id="snow-verdict" style="text-align:center; padding:10px; background:rgba(0,0,0,0.2); border-radius:8px; font-weight:bold; border:1px solid rgba(255,255,255,0.1);"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tool-opp" class="tool-card" style="display:none"><div class="card"><h3 data-t="h_opp">🔮 Il Costo della Verità</h3><div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;" data-t="desc_opp">Scopri quanto ti costa *davvero* una spesa inutile tra 20 anni.</div><div class="input-group"><label data-t="lbl_opp_cost">Costo Spesa Oggi (es. iPhone)</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="opp-cost"></div></div><div class="input-group"><label data-t="lbl_years">Orizzonte (Anni)</label><div class="input-wrapper"><input type="number" id="opp-years" value="20"></div></div><div class="switch-container" style="margin-top:5px; margin-bottom:15px;"><span style="font-size:0.8rem; color:#aaa;" data-t="lbl_infl">Considera Inflazione (2%)</span><label class="switch"><input type="checkbox" id="opp-inflation"><span class="slider"></span></label></div><button class="btn-gold" onclick="calcOppCost()" data-t="btn_opp">Svela la Verità</button><div id="opp-result" style="display:none; margin-top:15px; text-align:center;"><div style="font-size:0.8rem; color:#aaa;" id="opp-label">Se investiti nello S&P500...</div><div id="opp-val" style="font-size:1.8rem; font-weight:bold; color:var(--gold); text-shadow:var(--gold-glow);">€ 0</div></div></div></div>
+        <div id="tool-back" class="tool-card" style="display:none"><div class="card"><h3 data-t="h_back">⏳ Backtest Storico</h3><div class="input-group"><label data-t="lbl_monthly">Investimento Mensile</label><div class="input-wrapper"><span class="currency-symbol">€</span><input type="number" id="bt-amount" value="50"></div></div><div class="input-group"><label data-t="lbl_years">Durata (Anni)</label><div class="input-wrapper"><input type="number" id="bt-years" value="5"></div></div><button class="btn-gold" onclick="runBacktest()" data-t="btn_sim">Avvia Simulazione</button><div id="bt-results" style="display:none; margin-top:15px; font-size:0.9rem;"></div></div></div>
+    </div>
+
+    <div id="tab-report" class="tab-content" style="display:none;">
+        <div class="card" style="border:none; background:transparent; padding:0;">
+            <h3 data-t="h_rank">🏆 Classifica Piani</h3>
+            <div id="leaderboard-container"></div>
+            <h3 style="margin-top:30px;" data-t="h_archive">Archivio Report</h3>
+            <div id="report-container"></div>
+            <button class="btn-small" style="border-color:var(--red); color:var(--red); width:100%; margin-top:20px;" onclick="clearReports()" data-t="btn_clear">Svuota Tutto</button>
+        </div>
+    </div>
+
+    <div id="tab-menu" class="tab-content" style="display:none;">
+        <div class="card" style="padding:0; overflow:hidden;">
+            <div class="menu-list">
+                
+                <div class="menu-item">
+                    <span>Lingua / Language</span>
+                    <div>
+                        <button class="lang-btn" id="btn-it" onclick="setLanguage('it')">🇮🇹 IT</button>
+                        <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">🇺🇸 EN</button>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="toggleMenu('hist')"><span data-t="menu_hist">Gestisci Storico Grafico</span><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div id="menu-hist" class="menu-content"><div id="history-list-container"></div></div>
+
+                <div class="menu-item" onclick="exportData()" style="background:rgba(212,175,55,0.1);">
+                    <span style="color:var(--gold)" data-t="menu_export">Esporta Dati (Backup)</span><i class="fa-solid fa-download" style="color:var(--gold)"></i>
+                </div>
+                <div class="menu-item" onclick="document.getElementById('file-input').click()">
+                    <span data-t="menu_import">Importa Dati</span><i class="fa-solid fa-upload"></i>
+                </div>
+                <input type="file" id="file-input" class="hidden-file-input" onchange="importData(this)">
+
+                <div class="menu-item" style="border-top:1px solid rgba(255,255,255,0.1); margin-top:5px;" onclick="window.open('https://t.me/selectaitalia','_blank')"><span>Canale Telegram</span><i class="fa-brands fa-telegram" style="color:#2DE1FC"></i></div>
+
+                <div class="menu-item" style="border-top:1px solid rgba(255,255,255,0.1); margin-top:5px;" onclick="toggleMenu('faq')"><span data-t="menu_faq">Domande Frequenti (FAQ)</span><i class="fa-solid fa-circle-question"></i></div>
+                <div id="menu-faq" class="menu-content">
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Selecta è gratuita? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Sì, Selecta è un'applicazione web completamente gratuita. Il nostro obiettivo è democratizzare l'educazione finanziaria.</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Dove sono i miei dati? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Solo sul tuo telefono. Usiamo il LocalStorage del browser. Nessun dato viene mai inviato a server esterni. Privacy totale.</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Come si installa? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Da iPhone (Safari): Tasto Condividi -> Aggiungi a Home. <br>Da Android (Chrome): Menu -> Installa App / Aggiungi a Home.</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Cos'è il Costo della Verità? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">È un calcolatore di costo opportunità. Ti mostra quanto varrebbero oggi i soldi di una spesa superflua se li avessi investiti nello S&P500 per 20 anni.</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Siete consulenti? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">No. Selecta è uno strumento matematico educativo. Non forniamo consulenza finanziaria personalizzata.</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Cosa succede se cambio telefono? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Prima di cambiare, vai su Menu -> Esporta Dati. Salva il file. Sul nuovo telefono fai "Importa Dati".</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Perché vedo link promo? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Per mantenere l'app gratuita, usiamo link di affiliazione (es. Trade Republic). Se ti iscrivi tramite noi, supporti il progetto a costo zero.</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Come funziona il Debt Snowball? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">È un metodo matematico. Pagando un piccolo extra ogni mese sul debito, riduci drasticamente il capitale su cui maturano gli interessi, accorciando la durata del prestito.</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">I calcoli sono precisi? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Sono stime matematiche basate sui dati che inserisci. Tasse e inflazione reale possono variare.</div></div>
+                    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Come contatto il supporto? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Puoi scriverci direttamente sul nostro Bot Telegram ufficiale: <b>@SelectaHelpBot</b></div></div>
+                </div>
+
+                <div class="menu-item" onclick="toggleMenu('tos')"><span data-t="menu_tos">Termini e Condizioni</span><i class="fa-solid fa-chevron-right"></i></div>
+                <div id="menu-tos" class="menu-content">
+                    <div id="legal-it">
+                        <span class="legal-title">1. REQUISITI ED ACCETTAZIONE</span> L'utilizzo di Selecta App è riservato a utenti maggiorenni (18+). Accedendo, dichiari di avere almeno 18 anni.
+                        <span class="legal-title">2. ESCLUSIONE DI RESPONSABILITÀ</span> Selecta App è uno strumento di simulazione matematica a scopo puramente educativo. NON SIAMO CONSULENTI FINANZIARI. Nessuna informazione costituisce sollecitazione all'investimento. Tutti i calcoli sono stime. L'utente agisce sotto la propria esclusiva responsabilità.
+                        <span class="legal-title">3. LIMITAZIONE DI RESPONSABILITÀ ("AS IS")</span> Il servizio è fornito "così com'è". Non garantiamo l'assenza di errori. Non siamo responsabili per perdite finanziarie o danni diretti/indiretti.
+                        <span class="legal-title">4. AFFILIAZIONI</span> L'app contiene link di affiliazione. Selecta potrebbe ricevere una commissione se l'utente si iscrive tramite questi link.
+                        <span class="legal-title">5. GIURISDIZIONE</span> I presenti termini sono regolati dalla legge Italiana.
+                    </div>
+                    <div id="legal-en" style="display:none;">
+                        <span class="legal-title">1. AGE REQUIREMENTS</span> Users must be 18+.
+                        <span class="legal-title">2. NO FINANCIAL ADVICE</span> Educational tool only. We are not financial advisors. User acts at own risk.
+                        <span class="legal-title">3. DISCLAIMER</span> Service provided "as is". No liability for financial loss.
+                    </div>
+                </div>
+                
+                <div class="menu-item" onclick="toggleMenu('priv')"><span>Privacy Policy</span><i class="fa-solid fa-chevron-right"></i></div>
+                <div id="menu-priv" class="menu-content">
+                    <span class="legal-title">ARCHITETTURA LOCAL-FIRST</span> Selecta App adotta un approccio "Privacy by Design". Nessun dato personale identificabile (PII) o finanziario viene trasmesso, archiviato o elaborato su server remoti.
+                    <br><br>Tutti i dati inseriti nel "Caveau" vengono salvati <strong>esclusivamente</strong> nella memoria locale del browser (LocalStorage) del dispositivo dell'utente. Selecta Italia non ha alcun accesso ai tuoi dati.
+                    <span class="legal-title">RISCHIO PERDITA DATI</span> Poiché i dati risiedono nel tuo browser: 1. La cancellazione della cronologia/cache; 2. La navigazione in modalità "Incognito"; 3. Il cambio di dispositivo senza previo Backup; comporteranno la <strong>perdita irreversibile</strong> dei dati.
+                </div>
+
+                <div class="menu-item" onclick="hardReset()" style="border-top:1px solid rgba(255,77,77,0.2); margin-top:5px;"><span style="color:var(--red)" data-t="menu_reset">Reset Dati App</span><i class="fa-solid fa-trash" style="color:var(--red)"></i></div>
+            </div>
+        </div>
+        <div style="text-align:center; font-size:0.7rem; color:var(--text-muted); margin-top:20px;">
+            © 2026 Selecta Italia. All Rights Reserved.
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('myselecta', this)"><i class="fa-solid fa-vault"></i>MySelecta</div>
+        <div class="nav-item" onclick="switchTab('invest', this)"><i class="fa-solid fa-chart-line"></i>Invest</div>
+        <div class="nav-item" onclick="switchTab('tools', this)"><i class="fa-solid fa-screwdriver-wrench"></i>Tools</div>
+        <div class="nav-item" onclick="switchTab('report', this)"><i class="fa-solid fa-trophy"></i>Report</div>
+        <div class="nav-item" onclick="switchTab('menu', this)"><i class="fa-solid fa-bars"></i>Menu</div>
+    </div>
+
+    <script>
+        // --- TRANSLATIONS ---
+        const translations = {
+            it: {
+                promo_sub: "Liquidità 2% + 10€ Bonus Azioni", btn_redeem: "RISCATTA",
+                h_caveau: "Il Caveau", lbl_networth: "Patrimonio Netto", lbl_fire_prog: "Progresso F.I.R.E.",
+                lbl_cash: "Liquidità", lbl_invest: "Investimenti", lbl_real: "Valore Immobili", lbl_extra: "Extra",
+                lbl_debt: "PASSIVITÀ & MUTUI", lbl_rate: "Rata", lbl_int: "Interessi Tot", btn_save: "Salva Nello Storico",
+                mode_proj: "Proiezione", mode_goal: "Obiettivo 🎯", lbl_init_cap: "Capitale Iniziale", lbl_monthly: "Versamento Mensile",
+                lbl_goal_cap: "Obiettivo Capitale Finale", lbl_years: "Durata (Anni)", lbl_yield: "Rendimento Annuo (%)",
+                lbl_infl: "Calcola Inflazione (2%)", btn_calc: "Calcola", res_invested: "Versato", res_result: "Risultato", btn_report: "Salva Report",
+                lbl_asset_val: "Valore Asset (Totale)", lbl_equity: "Capitale Versato (Equity)", lbl_rent: "Affitto/Cedola Lorda (Mese)",
+                lbl_growth: "Rivalutazione Asset (%)", res_rent_cash: "Rendita Incassata", res_asset_final: "Valore Asset Finale",
+                desc_div: "Quanto capitale serve per la tua rendita passiva?", lbl_div_month: "Rendita Mensile Desiderata", 
+                lbl_div_yield: "Rendimento Annuo (%)", btn_calc_cap: "Calcola Capitale", res_cap_req: "Capitale Necessario",
+                h_opp: "🔮 Il Costo della Verità", desc_opp: "Scopri quanto ti costa *davvero* una spesa inutile tra 20 anni.",
+                lbl_opp_cost: "Costo Spesa Oggi (es. iPhone)", btn_opp: "Svela la Verità", opp_nom: "Valore Nominale (S&P500 10%)", opp_real: "Potere d'Acquisto Reale (al netto inflazione)",
+                h_tax: "⚖️ Calcolatore Netto", lbl_gross: "Plusvalenza Lorda", lbl_asset_type: "Tipo Asset", lbl_tot_cap: "Capitale Totale", btn_calc_net: "Calcola Netto",
+                lbl_fire_exp: "Spese Mensili Desiderate", lbl_fire_cur: "Capitale Attuale", lbl_fire_save: "Risparmio Mensile", lbl_swr: "Tasso di Prelievo Sicuro (%)",
+                fire_free: "LIBERO!", fire_today: "Oggi", fire_never: "Mai", fire_target: "Target", fire_years: "Anni", fire_months: "Mesi", fire_date_lbl: "Data Libertà",
+                h_back: "⏳ Backtest Storico", btn_sim: "Avvia Simulazione", back_mat: "Materasso",
+                h_rank: "🏆 Classifica Piani", h_archive: "Archivio Report", btn_clear: "Svuota Tutto",
+                menu_hist: "Gestisci Storico Grafico", menu_export: "Esporta Dati (Backup)", menu_import: "Importa Dati", menu_tos: "Termini e Condizioni", menu_reset: "Reset Dati App",
+                btn_tool_tax: "⚖️ Netto", btn_tool_fire: "🔥 FIRE", btn_tool_div: "💸 Divid", btn_tool_debt: "❄️ Debiti", btn_tool_opp: "🔮 Verità", btn_tool_back: "⏳ Backtest",
+                desc_debt: "Scopri se ti conviene estinguere il debito o investire la liquidità.", lbl_debt_tot: "Debito Totale", lbl_debt_rate: "Tasso Annuo Debito (%)", lbl_debt_pay: "Rata Attuale", lbl_debt_extra: "Extra Mensile Disponibile", res_time_saved: "Tempo Risparmiato", res_money_saved: "Interessi Risparmiati", res_total_extra: "Esborso Extra Totale",
+                menu_faq: "Domande Frequenti (FAQ)"
+            },
+            en: {
+                promo_sub: "2% Interest + €10 Stock Bonus", btn_redeem: "REDEEM",
+                h_caveau: "The Vault", lbl_networth: "Net Worth", lbl_fire_prog: "F.I.R.E. Progress",
+                lbl_cash: "Cash", lbl_invest: "Investments", lbl_real: "Real Estate", lbl_extra: "Extra",
+                lbl_debt: "LIABILITIES & LOANS", lbl_rate: "Monthly Payment", lbl_int: "Total Interest", btn_save: "Save to History",
+                mode_proj: "Projection", mode_goal: "Goal 🎯", lbl_init_cap: "Initial Capital", lbl_monthly: "Monthly Contribution",
+                lbl_goal_cap: "Target Final Capital", lbl_years: "Duration (Years)", lbl_yield: "Annual Yield (%)",
+                lbl_infl: "Adjust for Inflation (2%)", btn_calc: "Calculate", res_invested: "Invested", res_result: "Result", btn_report: "Save Report",
+                lbl_asset_val: "Asset Value (Total)", lbl_equity: "Equity Invested", lbl_rent: "Gross Rent (Monthly)",
+                lbl_growth: "Asset Appreciation (%)", res_rent_cash: "Total Rent", res_asset_final: "Final Asset Value",
+                desc_div: "How much capital do you need for passive income?", lbl_div_month: "Desired Monthly Income", 
+                lbl_div_yield: "Annual Yield (%)", btn_calc_cap: "Calculate Capital", res_cap_req: "Required Capital",
+                h_opp: "🔮 The Cost of Truth", desc_opp: "See the true cost of an expense in 20 years.",
+                lbl_opp_cost: "Expense Cost Today", btn_opp: "Reveal Truth", opp_nom: "Nominal Value (S&P500 10%)", opp_real: "Real Purchasing Power (Inflation adj.)",
+                h_tax: "⚖️ Net Calculator", lbl_gross: "Gross Profit", lbl_asset_type: "Asset Type", lbl_tot_cap: "Total Capital", btn_calc_net: "Calculate Net",
+                lbl_fire_exp: "Desired Monthly Expenses", lbl_fire_cur: "Current Capital", lbl_fire_save: "Monthly Savings", lbl_swr: "Safe Withdrawal Rate (%)",
+                fire_free: "FREE!", fire_today: "Today", fire_never: "Never", fire_target: "Target", fire_years: "Years", fire_months: "Months", fire_date_lbl: "Freedom Date",
+                h_back: "⏳ Historical Backtest", btn_sim: "Run Simulation", back_mat: "Cash",
+                h_rank: "🏆 Leaderboard", h_archive: "Report Archive", btn_clear: "Clear All",
+                menu_hist: "Manage Chart History", menu_export: "Export Data (Backup)", menu_import: "Import Data", menu_tos: "Terms & Conditions", menu_reset: "Reset App Data",
+                btn_tool_tax: "⚖️ Net", btn_tool_fire: "🔥 FIRE", btn_tool_div: "💸 Divid", btn_tool_debt: "❄️ Debt", btn_tool_opp: "🔮 Truth", btn_tool_back: "⏳ Backtest",
+                desc_debt: "Find out if it's better to pay off debt or invest.", lbl_debt_tot: "Total Debt", lbl_debt_rate: "Debt Annual Rate (%)", lbl_debt_pay: "Current Payment", lbl_debt_extra: "Monthly Extra Available", res_time_saved: "Time Saved", res_money_saved: "Interest Saved", res_total_extra: "Total Extra Paid",
+                menu_faq: "FAQ"
+            }
+        };
+
+        let currentLang = localStorage.getItem('selecta_lang') || 'it';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('selecta_lang', lang);
+            document.getElementById('btn-it').classList.toggle('active', lang==='it');
+            document.getElementById('btn-en').classList.toggle('active', lang==='en');
+            document.querySelectorAll('[data-t]').forEach(el => {
+                const key = el.getAttribute('data-t');
+                if(translations[lang][key]) el.innerText = translations[lang][key];
+            });
+            document.getElementById('legal-it').style.display = lang==='it' ? 'block' : 'none';
+            document.getElementById('legal-en').style.display = lang==='en' ? 'block' : 'none';
+            if(lang === 'en') {
+                document.getElementById('pac-name-edit').placeholder = "Scenario Name";
+                document.getElementById('ren-name-edit').placeholder = "Scenario Name";
+                document.getElementById('debt-cap').placeholder = "Remaining Capital";
+                document.getElementById('div-monthly').placeholder = "e.g. 500";
+            } else {
+                document.getElementById('pac-name-edit').placeholder = "Nome Scenario";
+                document.getElementById('ren-name-edit').placeholder = "Nome Scenario";
+                document.getElementById('debt-cap').placeholder = "Capitale Residuo";
+                document.getElementById('div-monthly').placeholder = "es. 500";
+            }
+            updateCaveau(); calcFire(); calcOppCost();
+        }
+
+        function t(key) { return translations[currentLang][key] || key; }
+
+        function toggleFaq(el) {
+            const answer = el.querySelector('.faq-a');
+            const icon = el.querySelector('i');
+            if(answer.style.display === 'block') {
+                answer.style.display = 'none';
+                icon.className = 'fa-solid fa-chevron-down';
+            } else {
+                answer.style.display = 'block';
+                icon.className = 'fa-solid fa-chevron-up';
+            }
+        }
+
+        // --- GLOBAL ---
+        let scenarios = JSON.parse(localStorage.getItem('selecta_v17_11_scen')) || { 
+            PAC: { A: {n:'PAC A', i:1000, m:200, y:10, r:5}, B: {n:'PAC B', i:1000, m:300, y:10, r:7}, C: {n:'PAC C', i:1000, m:500, y:10, r:10} }, 
+            REN: { A: {n:'REN A', a:150000, m:800, g:2, y:10}, B: {n:'REN B', a:200000, m:1000, g:2, y:10}, C: {n:'REN C', a:100000, m:500, g:2, y:10} } 
+        };
+        let activePac = 'A'; let activeRen = 'A'; let pacMode = 'proj';
+        let charts = {}; let isPrivacy = false;
+        let historyData = JSON.parse(localStorage.getItem('selecta_v17_11_hist')) || [];
+        let caveauType = 'doughnut';
+
+        // --- QUOTES ---
+        const quotes = ["Il mercato azionario è un meccanismo per trasferire denaro dagli impazienti ai pazienti. - Warren Buffett", "Non è quanto guadagni, ma quanto conservi. - Robert Kiyosaki", "La ricchezza è la capacità di vivere pienamente la vita. - Henry David Thoreau", "Investire deve essere più come guardare la vernice che si asciuga. - Paul Samuelson", "L'investimento in conoscenza paga sempre il miglior interesse. - Benjamin Franklin", "Chi capisce l'interesse composto lo guadagna, chi non lo capisce lo paga. - Albert Einstein", "Sii avido quando gli altri hanno paura, e abbi paura quando gli altri sono avidi. - Warren Buffett", "Il rischio deriva dal non sapere cosa stai facendo. - Warren Buffett", "La libertà finanziaria è disponibile per coloro che imparano a far lavorare i soldi per loro. - Robert Kiyosaki", "Non mettere tutte le uova nello stesso paniere. - Proverbio", "Il prezzo è quello che paghi. Il valore è quello che ottieni. - Warren Buffett", "Il denaro è un ottimo servitore, ma un pessimo padrone. - P.T. Barnum", "Non cercare l'ago nel pagliaio. Compra il pagliaio. - John Bogle", "L'inflazione è la tassa che viene imposta senza legislazione. - Milton Friedman", "La diversificazione è la protezione contro l'ignoranza. - Warren Buffett", "Se non trovi un modo per guadagnare mentre dormi, lavorerai fino alla morte. - Warren Buffett", "Le opportunità arrivano di rado. Quando piove oro, metti fuori il secchio. - Warren Buffett", "Investire in se stessi è l'investimento migliore. - Warren Buffett", "La disciplina è il ponte tra gli obiettivi e i risultati. - Jim Rohn", "L'azione è la chiave fondamentale di ogni successo. - Pablo Picasso"];
+        function renderDailyQuote() {
+            const today = new Date(); const start = new Date(today.getFullYear(), 0, 0); const diff = today - start; const oneDay = 1000 * 60 * 60 * 24; const dayOfYear = Math.floor(diff / oneDay);
+            document.getElementById('daily-quote').innerText = quotes[dayOfYear % quotes.length];
+        }
+
+        // --- NAV ---
+        function switchTab(id, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.getElementById('tab-' + id).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            if(id === 'invest') { loadScenario('PAC', activePac); loadScenario('REN', activeRen); }
+            if(id === 'report') renderLeaderboard();
+            if(id === 'menu') renderHistoryManagement();
+        }
+        function toggleMenu(id) { document.getElementById('menu-'+id).classList.toggle('open'); }
+        function togglePrivacy() { isPrivacy = !isPrivacy; document.body.classList.toggle('privacy-active'); document.getElementById('eye-icon').className = isPrivacy ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'; }
+
+        // --- TOOL SWITCHER ---
+        function showTool(id) {
+            document.querySelectorAll('.tool-card').forEach(c => c.style.display = 'none');
+            document.getElementById('tool-' + id).style.display = 'block';
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`button[onclick="showTool('${id}')"]`);
+            if(btn) btn.classList.add('active');
+        }
+        function showInvest(type) {
+            document.getElementById('inv-pac').style.display = type==='pac' ? 'block' : 'none';
+            document.getElementById('inv-ren').style.display = type==='ren' ? 'block' : 'none';
+            document.getElementById('btn-inv-pac').classList.toggle('active', type==='pac');
+            document.getElementById('btn-inv-ren').classList.toggle('active', type==='ren');
+            if(type==='pac') loadScenario('PAC', activePac); else loadScenario('REN', activeRen);
+        }
+
+        // --- CHART ---
+        function createChart(id, type, labels, datasets) { const ctx = document.getElementById(id).getContext('2d'); if(charts[id]) charts[id].destroy(); charts[id] = new Chart(ctx, { type, data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: type!=='doughnut', labels: { color: '#94a3b8', boxWidth: 10 } }, tooltip: { backgroundColor: 'rgba(5, 11, 20, 0.9)', titleColor: '#FFD700', bodyColor: '#fff' } }, scales: type==='line' ? { x:{display:false}, y:{grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8'}} } : {display:false}, elements: { point: { radius: 0, hoverRadius: 6 } } } }); }
+
+        // --- CAVEAU ---
+        function updateCaveau() {
+            const useCash = document.getElementById('chk-cash').checked; const c = useCash ? Number(document.getElementById('inp-cash').value) : 0;
+            const useInvest = document.getElementById('chk-invest').checked; const i = useInvest ? Number(document.getElementById('inp-invest').value) : 0;
+            const useCrypto = document.getElementById('chk-crypto').checked; const cr = useCrypto ? Number(document.getElementById('inp-crypto').value) : 0;
+            const useReal = document.getElementById('chk-real').checked; const r = useReal ? Number(document.getElementById('inp-real').value) : 0;
+            const useExtra = document.getElementById('chk-extra').checked; const e = useExtra ? Number(document.getElementById('inp-extra').value) : 0;
+            const useDebt = document.getElementById('chk-debt').checked; const dCap = useDebt ? Number(document.getElementById('debt-cap').value) : 0;
+            const totalAssets = c + i + cr + r + e;
+            const setPerc = (id, val) => { document.getElementById(id).innerText = (totalAssets > 0 && val > 0) ? '(' + ((val/totalAssets)*100).toFixed(1) + '%)' : ''; };
+            setPerc('perc-cash', c); setPerc('perc-invest', i); setPerc('perc-crypto', cr); setPerc('perc-real', r); setPerc('perc-extra', e);
+            
+            // ASSET vs LIABILITIES
+            document.getElementById('lbl-assets').innerText = '€ ' + totalAssets.toLocaleString();
+            document.getElementById('lbl-liabs').innerText = '€ ' + dCap.toLocaleString();
+
+            const dRate = Number(document.getElementById('debt-rate').value)/100/12; const dYears = Number(document.getElementById('debt-years').value)*12; let rata = 0; let totInt = 0;
+            if(Number(document.getElementById('debt-cap').value)>0 && dRate>0) { let dC = Number(document.getElementById('debt-cap').value); rata = dC * (dRate * Math.pow(1+dRate, dYears)) / (Math.pow(1+dRate, dYears) - 1); totInt = (rata * dYears) - dC; }
+            document.getElementById('debt-rata').innerText = '€ ' + rata.toFixed(2); document.getElementById('debt-int').innerText = '€ ' + totInt.toFixed(2);
+            const net = totalAssets - dCap; document.getElementById('netWorthDisplay').innerText = '€ ' + net.toLocaleString();
+            const deltaDiv = document.getElementById('delta-display');
+            if(historyData.length > 0) { const lastVal = historyData[historyData.length-1].val; const diff = net - lastVal; const diffPerc = lastVal > 0 ? (diff / lastVal) * 100 : 0; if(diff >= 0) deltaDiv.innerHTML = `<span class="text-green">+€ ${diff.toLocaleString()} (+${diffPerc.toFixed(1)}%) <i class="fa-solid fa-arrow-trend-up"></i></span>`; else deltaDiv.innerHTML = `<span class="text-red">-€ ${Math.abs(diff).toLocaleString()} (${diffPerc.toFixed(1)}%) <i class="fa-solid fa-arrow-trend-down"></i></span>`; } else { deltaDiv.innerHTML = '<span style="color:#666">---</span>'; }
+            const badge = document.getElementById('status-badge'); badge.className = 'status-badge';
+            if(net < 10000) { badge.innerText = "STANDARD"; badge.style.background='#333'; } else if(net < 50000) { badge.innerText = "SILVER"; badge.classList.add('status-silver'); } else if(net < 100000) { badge.innerText = "GOLD"; badge.classList.add('status-gold'); } else if(net < 500000) { badge.innerText = "PLATINUM"; badge.classList.add('status-platinum'); } else if(net < 1000000) { badge.innerText = "SELECTA BLACK"; badge.classList.add('status-black'); } else { badge.innerText = "DIAMOND"; badge.classList.add('status-diamond'); }
+            let fireGoal = localStorage.getItem('selecta_v17_11_fire_goal') || 450000; let perc = (net / fireGoal) * 100; if(perc > 100) perc = 100; document.getElementById('fire-bar').style.width = perc + '%'; document.getElementById('fire-perc').innerText = perc.toFixed(1) + '%';
+            localStorage.setItem('selecta_v17_11_caveau', JSON.stringify({ c, i, cr, r, e, dCap, dRate: dRate*1200, dYears: dYears/12, checks: {c:useCash, i:useInvest, cr:useCrypto, r:useReal, e:useExtra, d:useDebt} }));
+            renderCaveauChart(caveauType, c, i, cr, r, e, dCap, net);
+        }
+        function setCaveauType(type) { caveauType = type; document.getElementById('btn-cav-pie').classList.toggle('active', type==='doughnut'); document.getElementById('btn-cav-line').classList.toggle('active', type==='line'); updateCaveau(); }
+        function renderCaveauChart(type, c, i, cr, r, e, d, net) { const ctx = document.getElementById('caveauChart').getContext('2d'); if(charts['caveauChart']) charts['caveauChart'].destroy(); if(type === 'doughnut') { charts['caveauChart'] = new Chart(ctx, {type:'doughnut', data:{labels:['Liq','Inv','Cry','Imm','Ext','Deb'], datasets:[{data:[c,i,cr,r,e,d], backgroundColor:['#00FF9D','#FFD700','#2DE1FC','#3498DB','#9D00FF','#FF4D4D'], borderWidth:0}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'right', labels:{color:'#fff'}}}}}); } else { let labels = historyData.map(h => h.date); let data = historyData.map(h => h.val); const today = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'short'}); if(data.length === 0) { labels=['Start']; data=[0]; } else if (data.length === 1) { labels=['Start', labels[0]]; data=[0, data[0]]; } charts['caveauChart'] = new Chart(ctx, {type:'line', data:{labels:[...labels, today], datasets:[{label:'Net', data:[...data, net], borderColor:'#FFD700', backgroundColor:'rgba(255,215,0,0.1)', fill:true}]}, options:{responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false}, plugins:{legend:{labels:{color:'#94a3b8'}}}}}); } }
+        function saveHistoryPoint() { const net = Number(document.getElementById('netWorthDisplay').innerText.replace(/[^0-9]/g,'')); const date = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'short', year:'2-digit'}); historyData.push({date, val:net}); localStorage.setItem('selecta_v17_11_hist', JSON.stringify(historyData)); alert("OK"); updateCaveau(); renderHistoryManagement(); }
+        function renderHistoryManagement() { const container = document.getElementById('history-list-container'); container.innerHTML = ""; if(historyData.length === 0) { container.innerHTML = "<div style='color:#666; text-align:center;'>No Data</div>"; return; } historyData.forEach((item, index) => { container.innerHTML += `<div class="history-row"><span>${item.date}: <b>€ ${item.val.toLocaleString()}</b></span><i class="fa-solid fa-xmark history-del" onclick="deleteHistoryPoint(${index})"></i></div>`; }); }
+        function deleteHistoryPoint(index) { if(confirm("Delete?")) { historyData.splice(index, 1); localStorage.setItem('selecta_v17_11_hist', JSON.stringify(historyData)); renderHistoryManagement(); updateCaveau(); } }
+
+        // --- BACKUP ---
+        function exportData() { const data = { v: '17.11', caveau: localStorage.getItem('selecta_v17_11_caveau'), history: localStorage.getItem('selecta_v17_11_hist'), scen: localStorage.getItem('selecta_v17_11_scen'), rep: localStorage.getItem('selecta_rep_v17_11') }; const blob = new Blob([JSON.stringify(data)], {type: "application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "selecta_backup.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+        function importData(input) { const file = input.files[0]; const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if(data.caveau) localStorage.setItem('selecta_v17_11_caveau', data.caveau); if(data.history) localStorage.setItem('selecta_v17_11_hist', data.history); if(data.scen) localStorage.setItem('selecta_v17_11_scen', data.scen); if(data.rep) localStorage.setItem('selecta_rep_v17_11', data.rep); alert("OK"); location.reload(); } catch(err) { alert("Error"); } }; reader.readAsText(file); }
+        function loadDemoData() { localStorage.setItem('selecta_v17_11_caveau', JSON.stringify({ c:15000, i:45000, cr:5000, r:120000, e:10000, dCap:80000, dRate:3.5, dYears:20, checks:{c:true,i:true,cr:true,r:true,e:true,d:true} })); localStorage.setItem('selecta_v17_11_hist', JSON.stringify([{date:'Gen',val:90000},{date:'Feb',val:92000}])); location.reload(); }
+
+        // --- INVEST ---
+        function setPacMode(mode) { pacMode = mode; document.getElementById('mode-proj').classList.toggle('active', mode==='proj'); document.getElementById('mode-goal').classList.toggle('active', mode==='goal'); document.getElementById('inp-monthly-box').style.display = mode==='proj' ? 'block' : 'none'; document.getElementById('inp-goal-box').style.display = mode==='goal' ? 'block' : 'none'; calculatePAC(); }
+        function switchScenario(type, id) { if(type === 'PAC') activePac = id; else activeRen = id; document.querySelectorAll(`.scen-tab[id^="tab-${type}"]`).forEach(t => t.classList.remove('active')); document.getElementById(`tab-${type}-${id}`).classList.add('active'); loadScenario(type, id); }
+        function loadScenario(type, id) { const d = scenarios[type][id] || {}; if(scenarios['REN']['A'].n) document.getElementById(`tab-REN-A`).innerText = scenarios['REN']['A'].n; if(scenarios['REN']['B'].n) document.getElementById(`tab-REN-B`).innerText = scenarios['REN']['B'].n; if(scenarios['REN']['C'].n) document.getElementById(`tab-REN-C`).innerText = scenarios['REN']['C'].n; if(scenarios['PAC']['A'].n) document.getElementById(`tab-PAC-A`).innerText = scenarios['PAC']['A'].n; if(scenarios['PAC']['B'].n) document.getElementById(`tab-PAC-B`).innerText = scenarios['PAC']['B'].n; if(scenarios['PAC']['C'].n) document.getElementById(`tab-PAC-C`).innerText = scenarios['PAC']['C'].n; if(type === 'PAC') { document.getElementById('pac-name-edit').value = d.n || `PAC ${id}`; document.getElementById('pac-initial').value = d.i || 0; document.getElementById('pac-monthly').value = d.m || 0; document.getElementById('pac-years').value = d.y || 10; document.getElementById('pac-rate').value = d.r || 5; calculatePAC(); } else { document.getElementById('ren-name-edit').value = d.n || `REN ${id}`; document.getElementById('ren-asset').value = d.a || 0; document.getElementById('ren-monthly').value = d.m || 0; document.getElementById('ren-growth').value = d.g || 2; document.getElementById('ren-years').value = d.y || 10; calculateRen(); } }
+        function updateScenarioName(type) { const activeId = type === 'PAC' ? activePac : activeRen; const inputId = type === 'PAC' ? 'pac-name-edit' : 'ren-name-edit'; const newName = document.getElementById(inputId).value; scenarios[type][activeId].n = newName; document.getElementById(`tab-${type}-${activeId}`).innerText = newName; localStorage.setItem('selecta_v17_11_scen', JSON.stringify(scenarios)); }
+        function calculatePAC(forceType) { scenarios.PAC[activePac] = { n: document.getElementById('pac-name-edit').value, i: Number(document.getElementById('pac-initial').value), m: Number(document.getElementById('pac-monthly').value), y: Number(document.getElementById('pac-years').value), r: Number(document.getElementById('pac-rate').value) }; localStorage.setItem('selecta_v17_11_scen', JSON.stringify(scenarios)); const P = scenarios.PAC[activePac].i; const Y = scenarios.PAC[activePac].y; const R = scenarios.PAC[activePac].r / 100; const infl = document.getElementById('pac-inflation').checked ? 0.02 : 0; let M = 0; let Final = 0; let Invested = 0; let dataTot = [], dataInv = [], labels=[]; if(pacMode === 'proj') { M = Number(document.getElementById('pac-monthly').value); let curr = P; let inv = P; for(let m=1; m<=Y*12; m++) { curr = (curr + M) * (1 + (R/12)); inv += M; labels.push(m); dataTot.push(curr); dataInv.push(inv); } if(infl>0) curr = curr / Math.pow(1+infl, Y); Final = curr; Invested = inv; } else { const Goal = Number(document.getElementById('pac-goal').value); const r_mo = R/12; const n = Y*12; const FV_P = P * Math.pow(1+r_mo, n); M = (Goal - FV_P) / ((Math.pow(1+r_mo, n) - 1) / r_mo); if(M<0) M=0; Final = M; Invested = Goal; let curr = P; let inv = P; for(let m=1; m<=Y*12; m++) { curr = (curr + M) * (1 + r_mo); inv += M; labels.push(m); dataTot.push(curr); dataInv.push(inv); } } document.getElementById('res-pac-invested').innerText = '€ ' + Invested.toLocaleString(); document.getElementById('res-pac-total').innerText = '€ ' + Math.round(Final).toLocaleString(); const chart = charts['pacChart']; const type = forceType || (chart ? chart.config.type : 'line'); document.getElementById('btn-pac-line').classList.toggle('active', type==='line'); document.getElementById('btn-pac-pie').classList.toggle('active', type==='doughnut'); if(type === 'line') createChart('pacChart', 'line', labels, [{label:'Finale', data:dataTot, borderColor:'#00FF9D', backgroundColor:'rgba(0,255,157,0.1)', fill:true}, {label:'Versato', data:dataInv, borderColor:'#1565c0', borderDash:[5,5]}]); else { let gain = pacMode==='proj' ? (Final-Invested) : 0; if(gain<0) gain=0; createChart('pacChart', 'doughnut', ['Versato','Guadagno'], [{data:[Invested,gain], backgroundColor:['#1565c0','#00FF9D'], borderWidth:0}]); } }
+        function togglePacChartType(t) { calculatePAC(t); }
+        function calculateRen(forceType) { scenarios.REN[activeRen] = { n: document.getElementById('ren-name-edit').value, a: Number(document.getElementById('ren-asset').value), m: Number(document.getElementById('ren-monthly').value), g: Number(document.getElementById('ren-growth').value), y: Number(document.getElementById('ren-years').value) }; localStorage.setItem('selecta_v17_11_scen', JSON.stringify(scenarios)); const A = scenarios.REN[activeRen].a; const M = scenarios.REN[activeRen].m; const G = scenarios.REN[activeRen].g / 100; const Y = scenarios.REN[activeRen].y; const infl = document.getElementById('ren-inflation').checked ? 0.02 : 0; const labels = []; const dataAsset = []; const dataCash = []; let curA = A; let curC = 0; for(let m=1; m<=Y*12; m++) { curA = curA * (1 + (G/12)); curC += M; let realA = curA; let realC = curC; if(infl > 0) { realA = realA / Math.pow(1+infl, m/12); realC = realC / Math.pow(1+infl, m/12); } labels.push(m); dataAsset.push(realA); dataCash.push(realC); } document.getElementById('res-ren-cash').innerText = '€ ' + Math.round(dataCash[dataCash.length-1]).toLocaleString(); document.getElementById('res-ren-asset').innerText = '€ ' + Math.round(dataAsset[dataAsset.length-1]).toLocaleString(); const chart = charts['renChart']; const type = forceType || (chart ? chart.config.type : 'line'); document.getElementById('btn-ren-line').classList.toggle('active', type==='line'); document.getElementById('btn-ren-pie').classList.toggle('active', type==='doughnut'); if(type === 'line') createChart('renChart', 'line', labels, [{label:'Valore Immobile', data:dataAsset, borderColor:'#3498DB'}, {label:'Affitti Incassati', data:dataCash, borderColor:'#00FF9D'}]); else createChart('renChart', 'doughnut', ['Valore Asset','Affitti Totali'], [{data:[dataAsset[dataAsset.length-1], dataCash[dataCash.length-1]], backgroundColor:['#3498DB','#00FF9D'], borderWidth:0}]); }
+        function toggleRenChartType(t) { calculateRen(t); }
+        document.getElementById('tax-stamp').addEventListener('change', (e) => { document.getElementById('tax-cap-wrap').style.display = e.target.checked ? 'block' : 'none'; });
+        function calcTax() { const g = Number(document.getElementById('tax-gross').value); const r = Number(document.getElementById('tax-type').value); let tax = g * r; if(document.getElementById('tax-stamp').checked) { tax += Number(document.getElementById('tax-cap').value) * 0.002; } document.getElementById('tax-res').innerText = 'Netto: € ' + (g - tax).toLocaleString(); }
+        function calcDividend() { const monthly = Number(document.getElementById('div-monthly').value); const yieldPerc = Number(document.getElementById('div-yield').value); if(yieldPerc > 0) { const capital = (monthly * 12) / (yieldPerc / 100); document.getElementById('div-result').style.display = 'block'; document.getElementById('div-val').innerText = '€ ' + Math.round(capital).toLocaleString(); } }
+        function calcOppCost() { const cost = Number(document.getElementById('opp-cost').value); const years = Number(document.getElementById('opp-years').value); const useInfl = document.getElementById('opp-inflation').checked; const rate = 0.10; let futureVal = cost * Math.pow(1 + rate, years); if(useInfl) { futureVal = futureVal / Math.pow(1 + 0.02, years); document.getElementById('opp-label').innerText = t('opp_real'); } else { document.getElementById('opp-label').innerText = t('opp_nom'); } document.getElementById('opp-result').style.display = 'block'; document.getElementById('opp-val').innerText = '€ ' + Math.round(futureVal).toLocaleString(); }
+        function runBacktest() { const m = Number(document.getElementById('bt-amount').value); const y = Number(document.getElementById('bt-years').value); const months = y*12; const cash = m*months; const sp = m * ((Math.pow(1+0.10/12, months)-1)/(0.10/12)); const btc = m * ((Math.pow(1+0.55/12, months)-1)/(0.55/12)); document.getElementById('bt-results').style.display = 'block'; document.getElementById('bt-results').innerHTML = `${t('back_mat')}: <b>€${cash.toLocaleString()}</b><br>S&P500: <b style="color:#00FF9D">€${Math.round(sp).toLocaleString()}</b><br>BTC: <b style="color:#FFD700">€${Math.round(btc).toLocaleString()}</b>`; }
+        function calcFire() { const exp = Number(document.getElementById('fire-exp').value); const cur = Number(document.getElementById('fire-cur').value); const sav = Number(document.getElementById('fire-save').value); const swr = Number(document.getElementById('fire-swr').value) || 4; const multiplier = 100 / swr; const goal = exp * 12 * multiplier; document.getElementById('fire-target').innerText = t('fire_target') + ": € "+Math.round(goal).toLocaleString(); localStorage.setItem('selecta_v17_11_fire_goal', goal); if(cur>=goal) { document.getElementById('fire-res').innerText=t('fire_free'); document.getElementById('fire-date').innerText = t('fire_today'); return; } if(sav<=0) { document.getElementById('fire-res').innerText=t('fire_never'); document.getElementById('fire-date').innerText = "---"; return; } let m=0, b=cur; while(b<goal && m<1200) { b=(b+sav)*(1+0.07/12); m++; } document.getElementById('fire-res').innerText=`${Math.floor(m/12)} ${t('fire_years')} ${m%12} ${t('fire_months')}`; const today = new Date(); today.setMonth(today.getMonth() + m); const dateStr = today.toLocaleDateString(currentLang==='it'?'it-IT':'en-US', {month: 'long', year: 'numeric'}); document.getElementById('fire-date').innerText = t('fire_date_lbl') + ": " + dateStr; }
+        
+        // --- DEBT DILEMMA & SNOWBALL ---
+        function calcDebtSnowball() {
+            const P = Number(document.getElementById('snow-tot').value);
+            const rate = Number(document.getElementById('snow-rate').value) / 100 / 12;
+            const pay = Number(document.getElementById('snow-pay').value);
+            const extra = Number(document.getElementById('snow-extra').value);
+            const investRate = Number(document.getElementById('snow-invest-rate').value) / 100 / 12; // Monthly invest rate
+
+            if(P <= 0 || pay <= 0) return;
+
+            // 1. Calc Standard vs Accelerated Loan
+            function calcLoan(principal, r, monthlyPay) {
+                let balance = principal; let months = 0; let totalInt = 0;
+                while(balance > 0 && months < 600) {
+                    let interest = balance * r; let principalPart = monthlyPay - interest;
+                    if(principalPart <= 0) return null;
+                    balance -= principalPart; totalInt += interest; months++;
+                }
+                return { months, totalInt };
+            }
+
+            const normal = calcLoan(P, rate, pay);
+            const accelerated = calcLoan(P, rate, pay + extra);
+            
+            const resDiv = document.getElementById('snow-result'); 
+            resDiv.style.display = 'block';
+
+            if(!normal) { resDiv.innerHTML = "<span class='text-red'>Rata troppo bassa!</span>"; return; }
+            if(extra <= 0) { resDiv.innerHTML = "Inserisci un Extra."; return; }
+
+            const savedMonths = normal.months - accelerated.months;
+            const savedInterest = normal.totalInt - accelerated.totalInt;
+
+            // 2. Calc Investment Potential (Dilemma)
+            // If we invest 'extra' for 'accelerated.months' instead of paying debt
+            let investValue = 0;
+            if(investRate > 0) {
+                // FV of annuity
+                investValue = extra * ((Math.pow(1 + investRate, accelerated.months) - 1) / investRate);
+                // Total Interest Earned = Final Value - Principal Invested
+                const totalInvested = extra * accelerated.months;
+                const earnedInterest = investValue - totalInvested;
+                
+                document.getElementById('snow-invest-res').innerText = '€ ' + Math.round(earnedInterest).toLocaleString();
+
+                const verdict = document.getElementById('snow-verdict');
+                const diff = Math.abs(savedInterest - earnedInterest);
+                
+                if(savedInterest > earnedInterest) {
+                    verdict.innerHTML = `CONVIENE: <span class="text-green">ESTINGUERE</span> (+€${Math.round(diff).toLocaleString()})`;
+                    verdict.style.borderColor = '#00FF9D';
+                } else {
+                    verdict.innerHTML = `CONVIENE: <span class="text-gold">INVESTIRE</span> (+€${Math.round(diff).toLocaleString()})`;
+                    verdict.style.borderColor = '#FFD700';
+                }
+            } else {
+                document.getElementById('snow-invest-res').innerText = "---";
+                document.getElementById('snow-verdict').innerHTML = "";
+                document.getElementById('snow-verdict').style.border = "none";
+            }
+
+            const yearsSaved = Math.floor(savedMonths / 12); const monthsSaved = savedMonths % 12;
+            let timeStr = ""; if(yearsSaved > 0) timeStr += `${yearsSaved} Anni `; if(monthsSaved > 0) timeStr += `${monthsSaved} Mesi`;
+
+            document.getElementById('snow-time').innerText = timeStr || "0 Mesi";
+            document.getElementById('snow-save').innerText = '€ ' + Math.round(savedInterest).toLocaleString();
+        }
+
+        function saveReport(type) { let data = {}, title = "", val = 0; if(type === 'pac') { title = `${scenarios.PAC[activePac].n}`; val = Number(document.getElementById('res-pac-total').innerText.replace(/[^0-9]/g, '')); const m = Number(document.getElementById('pac-monthly').value); const y = Number(document.getElementById('pac-years').value); data = { type:'pac', val, name:activePac, m, y }; } else { title = `${scenarios.REN[activeRen].n}`; const assetV = Number(document.getElementById('res-ren-asset').innerText.replace(/[^0-9]/g, '')); const cashV = Number(document.getElementById('res-ren-cash').innerText.replace(/[^0-9]/g, '')); val = assetV + cashV; data = { type:'ren', val, name:activeRen, assetV, cashV, y:Number(document.getElementById('ren-years').value) }; } let reps = JSON.parse(localStorage.getItem('selecta_rep_v17_11')||'[]'); reps.unshift({ id:Date.now(), title, val, data }); localStorage.setItem('selecta_rep_v17_11', JSON.stringify(reps)); alert("OK"); }
+        function renderLeaderboard() { const cont = document.getElementById('report-container'); const board = document.getElementById('leaderboard-container'); cont.innerHTML = ""; board.innerHTML = ""; let reps = JSON.parse(localStorage.getItem('selecta_rep_v17_11')||'[]'); if(reps.length === 0) { board.innerHTML = "<div style='text-align:center; color:#666'>...</div>"; return; } reps.sort((a,b)=>b.val-a.val); let html = "<div class='leaderboard-box'>"; reps.slice(0,3).forEach((r,i) => { let det = r.data.type==='pac' ? `PAC ${r.data.y} ${t('fire_years')}` : `Asset + Rent`; html += `<div class="rank-row"><div class="rank-pos rank-${i+1}">${i+1}</div><div><div class="rank-name">${r.title}</div><div class="rank-detail">${det}</div></div><div class="rank-val censored">€ ${r.val.toLocaleString()}</div></div>`; }); html += "</div>"; board.innerHTML = html; reps.forEach(r => { let detailText = r.data.type === 'pac' ? `PAC ${r.data.y} Yrs` : `Asset €${r.data.assetV.toLocaleString()}`; let div = document.createElement('div'); div.className = 'card'; div.innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.8rem; color:var(--text-muted);"><span>${new Date(r.id).toLocaleDateString()}</span><i class="fa-solid fa-trash text-red" style="cursor:pointer;" onclick="deleteRep(${r.id})"></i></div><div class="rep-card-body"><div class="rep-chart-box"><canvas id="rep-${r.id}"></canvas></div><div class="rep-info-box"><div style="font-weight:bold; margin-bottom:5px;">${r.title}</div><div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:5px;">${detailText}</div><div class="text-green censored" style="font-weight:bold; font-size:1.1rem;">€ ${r.val.toLocaleString()}</div><button class="btn-small" style="margin-top:5px; border-color:var(--gold); color:var(--gold);" onclick="toggleRepChart(${r.id})">Switch</button></div></div>`; cont.appendChild(div); setTimeout(() => { const ctx = document.getElementById(`rep-${r.id}`).getContext('2d'); let labels = ['A','B']; let data = [10,20]; if(r.data.type === 'pac') { let invested = r.data.m * 12 * r.data.y; labels=['Inv','Gain']; data=[invested, r.val-invested]; } else { labels=['Asset','Rent']; data=[r.data.assetV, r.data.cashV]; } r.chartType = r.chartType || 'doughnut'; if(r.chartType === 'line') { new Chart(ctx, { type: 'line', data: { labels:['Start','End'], datasets:[{data:[0, r.val], borderColor:'#FFD700', backgroundColor:'rgba(255,215,0,0.1)', fill:true}] }, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}}} }); } else { new Chart(ctx, { type: 'doughnut', data: { labels, datasets:[{data, backgroundColor:['#1565c0','#00FF9D'], borderWidth:0}] }, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}} }); } }, 100); }); }
+        function deleteRep(id) { let reps = JSON.parse(localStorage.getItem('selecta_rep_v17_11')||'[]'); reps = reps.filter(r => r.id !== id); localStorage.setItem('selecta_rep_v17_11', JSON.stringify(reps)); renderLeaderboard(); }
+        function toggleRepChart(id) { let reps = JSON.parse(localStorage.getItem('selecta_rep_v17_11')||'[]'); let r = reps.find(x => x.id === id); r.chartType = r.chartType === 'line' ? 'doughnut' : 'line'; localStorage.setItem('selecta_rep_v17_11', JSON.stringify(reps)); renderLeaderboard(); }
+        function clearReports() { localStorage.removeItem('selecta_rep_v17_11'); renderLeaderboard(); }
+        function hardReset() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
+
+        window.onload = function() {
+            setLanguage(currentLang);
+            const cav = JSON.parse(localStorage.getItem('selecta_v17_11_caveau'));
+            if(cav) {
+                document.getElementById('inp-cash').value = cav.c; document.getElementById('chk-cash').checked = cav.checks?.c ?? true;
+                document.getElementById('inp-invest').value = cav.i; document.getElementById('chk-invest').checked = cav.checks?.i ?? true;
+                document.getElementById('inp-crypto').value = cav.cr; document.getElementById('chk-crypto').checked = cav.checks?.cr ?? true;
+                document.getElementById('inp-real').value = cav.r; document.getElementById('chk-real').checked = cav.checks?.r ?? true;
+                document.getElementById('inp-extra').value = cav.e || 0; document.getElementById('chk-extra').checked = cav.checks?.e ?? true;
+                document.getElementById('debt-cap').value = cav.dCap; document.getElementById('chk-debt').checked = cav.checks?.d ?? true;
+                document.getElementById('debt-rate').value = (cav.dRate/12).toFixed(1);
+                document.getElementById('debt-years').value = cav.dYears;
+            } else { setTimeout(() => { if(confirm("Benvenuto in Selecta.\n\nVuoi caricare i dati DEMO per vedere come funziona?")) { loadDemoData(); } else { updateCaveau(); } }, 800); }
+            updateCaveau(); switchScenario('PAC','A'); switchScenario('REN','A'); calcFire(); renderDailyQuote(); showTool('tax'); // Default tool open
+        };
+    </script>
+</body>
+</html>
